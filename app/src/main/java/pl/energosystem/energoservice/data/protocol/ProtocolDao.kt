@@ -1,4 +1,4 @@
-package pl.energosystem.energoservice.data
+package pl.energosystem.energoservice.data.protocol
 
 import androidx.room.Dao
 import androidx.room.Delete

@@ -1,9 +1,6 @@
-package pl.energosystem.energoservice.data
+package pl.energosystem.energoservice.data.protocol
 
 import kotlinx.coroutines.flow.Flow
-import pl.energosystem.energoservice.data.Protocol
-import pl.energosystem.energoservice.data.ProtocolDao
-import pl.energosystem.energoservice.data.ProtocolsRepository
 
 class OfflineProtocolsRepository(private val protocolDao: ProtocolDao): ProtocolsRepository {
     override fun getAllProtocolsStream(): Flow<List<Protocol>> = protocolDao.getAllProtocols()

@@ -1,4 +1,4 @@
-package pl.energosystem.energoservice.data
+package pl.energosystem.energoservice.data.protocol
 
 import kotlinx.coroutines.flow.Flow
 

@@ -1,4 +1,4 @@
-package pl.energosystem.energoservice.data
+package pl.energosystem.energoservice.data.protocol
 
 import android.content.Context
 import androidx.room.Database
