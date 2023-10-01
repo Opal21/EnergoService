@@ -22,6 +22,6 @@ interface UserDao {
     @Query("SELECT * FROM users_db")
     fun getAllUsers(): Flow<List<User>>
 
-    @Query("SELECT * FROM users_db WHERE id = :id")
-    fun getUserByID(id: Int): Flow<User>
+    @Query("SELECT * FROM users_db WHERE email = :email AND password = :password")
+    suspend fun getUserByEmailPassword(email: String, password: String): User?
 }

@@ -9,9 +9,9 @@ interface UsersRepository {
     fun getAllUsersStream(): Flow<List<User>>
 
     /**
-     * Retrieve an User from the given data source that matches with the [id].
+     * Retrieve an User from the given data source that matches with the [email] and [password].
      */
-    fun getUserStream(id: Int): Flow<User?>
+    suspend fun getUser(email: String, password: String): User?
 
     /**
      * Insert User in the data source
