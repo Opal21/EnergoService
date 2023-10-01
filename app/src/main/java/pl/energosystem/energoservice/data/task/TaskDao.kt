@@ -7,7 +7,6 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
-import java.util.Date
 
 @Dao
 interface TaskDao {
@@ -27,5 +26,5 @@ interface TaskDao {
     fun getTaskByID(id: Int): Flow<Task>
 
     @Query("SELECT * FROM tasks_db WHERE task_date = :date")
-    fun getTasksByDate(date: Date): Flow<List<Task>>
+    fun getTasksByDate(date: String): Flow<List<Task>>
 }

@@ -1,7 +1,6 @@
 package pl.energosystem.energoservice.data.task
 
 import kotlinx.coroutines.flow.Flow
-import java.util.Date
 
 interface TasksRepository {
     /**
@@ -17,7 +16,7 @@ interface TasksRepository {
     /**
      * Retrieve all Tasks from the given data source that matches with the [date]
      */
-    fun getTasksByDate(date: Date): Flow<List<Task>>
+    fun getTasksByDate(date: String): Flow<List<Task>>
 
     /**
      * Insert Task in the data source
