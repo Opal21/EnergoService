@@ -9,19 +9,26 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
+import pl.energosystem.energoservice.ui.AppViewModelProvider
 
 @Composable
 fun SettingsScreen(
     modifier: Modifier,
     isLoggedIn: MutableState<Boolean>,
+    viewModel: SettingsViewModel = viewModel(factory = AppViewModelProvider.Factory),
+    onLogOutClicked: () -> Unit,
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+
         Text(text = "Settings")
-        Button(onClick = { isLoggedIn.value = false }) {
+
+        Button(onClick = { isLoggedIn.value = viewModel.logOut(onLogOutClicked) }
+        ) {
             Text(text = "Log Out")
         }
     }
