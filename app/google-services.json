@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "841321340971",
+    "project_id": "energoservice-845b1",
+    "storage_bucket": "energoservice-845b1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:841321340971:android:d343b63348467a4fa30a6e",
+        "android_client_info": {
+          "package_name": "pl.energosystem.energoservice"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDSFi7uHTrVvtBnjRfSNs8YXZeWd9_D_wo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
