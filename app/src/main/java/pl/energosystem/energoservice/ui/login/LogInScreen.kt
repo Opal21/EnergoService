@@ -18,15 +18,14 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -39,16 +38,14 @@ fun LogInScreen(
     viewModel: LogInViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val uiState = viewModel.uiState.collectAsState()
-    val scope = rememberCoroutineScope()
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(8.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        val focusRequester = remember { FocusRequester() }
         val focusManager = LocalFocusManager.current
 
         Image(imageVector = Icons.Default.Settings, contentDescription = null, modifier = Modifier
@@ -80,9 +77,12 @@ fun LogInScreen(
             onValueChange = { viewModel.onPasswordChange(it) },
             label = { Text(text = "Password") },
             modifier = Modifier
-                .fillMaxWidth()
-                .onFocusChanged { focusState -> },
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                .fillMaxWidth(),
+            visualTransformation = PasswordVisualTransformation(),
+            keyboardOptions = KeyboardOptions(
+                    imeAction = ImeAction.Done,
+            keyboardType = KeyboardType.Password
+            ),
             keyboardActions = KeyboardActions(
                 onDone = {
                     focusManager.clearFocus() 
@@ -91,7 +91,7 @@ fun LogInScreen(
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        Button(onClick = onSuccessfulLogIn) {
+        Button(onClick = { viewModel.logIn(onSuccessfulLogIn) }) {
             Text(text = "Log In")
         }
     }
@@ -104,5 +104,5 @@ fun LogInScreen(
     showBackground = true,
 )
 fun LogInScreenPreview() {
-    LogInScreen(onSuccessfulLogIn = { /*TODO*/ })
+    LogInScreen(onSuccessfulLogIn = {  })
 }

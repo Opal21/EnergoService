@@ -3,30 +3,38 @@ package pl.energosystem.energoservice.ui.login
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import pl.energosystem.energoservice.data.user.User
+import pl.energosystem.energoservice.data.user.UsersRepository
 
-class LogInViewModel : ViewModel() {
+class LogInViewModel(
+    private val usersRepository: UsersRepository
+) : ViewModel() {
+
+    init {
+        this.viewModelScope.launch {
+            usersRepository.insertUser(User(0, "test", "test"))
+        }
+    }
 
     private val _uiState = MutableStateFlow(LogInUiState())
     val uiState: StateFlow<LogInUiState> = _uiState
 
-    private val logInData = MutableStateFlow(Pair(true, false))
-    private val emailFieldText = MutableStateFlow("")
-    private val passwordTextField = MutableStateFlow("")
-
     fun logIn(
-        email: String,
-        password: String,
         onLogInComplete: () -> Unit,
     ) {
-        if (email.isNotBlank() && password.isNotBlank())
-            onLogInComplete()
-        else
-            _uiState.value = _uiState.value.copy(isEmailValid = false)
+        this.viewModelScope.launch {
+            val userExists = usersRepository
+                .getUser(uiState.value.emailFieldText, uiState.value.passwordTextField) != null
+
+            if (userExists){
+                clearTextFields()
+                onLogInComplete()
+            } else {
+                _uiState.value = _uiState.value.copy(isEmailValid = false, isPasswordEmpty = true)
+            }
+        }
     }
 
     fun onEmailChange(newEmail: String) {
@@ -41,10 +49,9 @@ class LogInViewModel : ViewModel() {
         }
     }
 
-    companion object {
-        private const val TIMEOUT_MILLIS = 5_000L
+    fun clearTextFields() {
+        _uiState.value = _uiState.value.copy(emailFieldText = "", passwordTextField = "")
     }
-
 }
 
 data class LogInUiState(
