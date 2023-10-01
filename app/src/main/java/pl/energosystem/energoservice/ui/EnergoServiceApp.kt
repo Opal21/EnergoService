@@ -5,7 +5,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -16,9 +15,6 @@ import pl.energosystem.energoservice.ui.login.LogInScreen
 @Composable
 fun EnergoServiceApp() {
     val navController = rememberNavController()
-    val navigationActions = remember(navController) {
-        EnergoServiceNavigationActions(navController)
-    }
     val isLoggedIn = rememberSaveable { mutableStateOf(false) }
     // Subscribe to navBackStackEntry, required to get current route
     val navBackStackEntry by navController.currentBackStackEntryAsState()
