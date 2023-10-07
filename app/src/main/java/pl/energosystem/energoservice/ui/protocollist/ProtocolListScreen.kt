@@ -2,7 +2,9 @@ package pl.energosystem.energoservice.ui.protocollist
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import pl.energosystem.energoservice.ui.AppViewModelProvider
 
@@ -10,6 +12,29 @@ import pl.energosystem.energoservice.ui.AppViewModelProvider
 fun ProtocolListScreen(
     modifier: Modifier = Modifier,
     viewModel: ProtocolListViewModel = viewModel(factory = AppViewModelProvider.Factory),
-    onProtocolClicked: () -> Unit) {
+    onProtocolClicked: () -> Unit,
+    ) {
+
+    val uiState = viewModel.uiState.collectAsState()
+
+    ProtocolListScreenContent(
+        onProtocolClicked = onProtocolClicked,
+        modifier = modifier
+    )
+}
+
+@Composable
+fun ProtocolListScreenContent(
+    onProtocolClicked: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Text(text = "List of protocols")
+}
+
+@Composable
+@Preview
+fun ProtocolListScreenContentPreview() {
+    ProtocolListScreenContent(
+        onProtocolClicked = {  }
+    )
 }
