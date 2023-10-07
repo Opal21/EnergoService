@@ -104,7 +104,7 @@ fun EnergoServiceNavHost(
         startDestination = TASK_LIST
     ) {
         composable(SETTINGS) {
-            SettingsScreen(modifier, isLoggedIn) {
+            SettingsScreen(isLoggedIn, modifier) {
                 navController.navigate(TASK_LIST)
             }
         }
