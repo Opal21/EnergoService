@@ -49,7 +49,7 @@ class LogInViewModel(
         }
     }
 
-    fun clearTextFields() {
+    private fun clearTextFields() {
         _uiState.value = _uiState.value.copy(emailFieldText = "", passwordTextField = "")
     }
 }
