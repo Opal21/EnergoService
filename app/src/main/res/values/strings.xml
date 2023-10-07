@@ -6,4 +6,7 @@
     <string name="tab_settings">Settings</string>
 
     <string name="empty_screen_title">Screen under construction</string>
+    <string name="email_field_label">Email</string>
+    <string name="password_field_label">Password</string>
+    <string name="log_in_button_text">Log In</string>
 </resources>
