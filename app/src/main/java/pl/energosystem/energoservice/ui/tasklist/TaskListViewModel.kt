@@ -25,9 +25,7 @@ class TaskListViewModel(
                     shortDescription = "shortDescription",
                     longDescription = "Unless your app is receiving pending intents from other apps, the above methods to create a PendingIntent are probably the only PendingIntent methods you'll ever need.\n" +
                             "\n" +
-                            "Each method takes the current app Context, the Intent you want to wrap, and one or more flags that specify how the intent should be used (such as whether the intent can be used more than once).\n" +
-                            "\n" +
-                            "For more information about using pending intents, see the documentation for each of the respective use cases, such as in the Notifications and App Widgets API guides.",
+                            "Each method takes the current app Context, the Intent you want to wrap, and one or more flags that specify how the intent should be used (such as whether the intent can be used more than once).",
                     address = "1600 Amphitheatre Parkway, Mountain+View, California",
                     phoneNumber = "664254824",
                     date =  LocalDate.now().toString(),
@@ -40,8 +38,6 @@ class TaskListViewModel(
     // UI state exposed to the UI
     private val _uiState = MutableStateFlow(TaskListUiState(loading = true))
     val uiState: StateFlow<TaskListUiState> = _uiState
-
-    fun isTaskOpen() = uiState.value.openedTask != null
 
     private fun observeTasks() {
         viewModelScope.launch{
@@ -87,12 +83,9 @@ class TaskListViewModel(
         return mapIntent
     }
 
-    fun getDialIntent(phoneNumber: String) : Intent {
-        val intent = Intent(Intent.ACTION_DIAL)
-        intent.data = Uri.parse("tel:$phoneNumber")
-        return intent
-    }
-
+    fun getDialIntent(phoneNumber: String) = Intent(Intent.ACTION_DIAL).apply {
+            data = Uri.parse("tel:$phoneNumber")
+        }
 }
 
 data class TaskListUiState(
