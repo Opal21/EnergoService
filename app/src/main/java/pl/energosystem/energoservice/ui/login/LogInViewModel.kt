@@ -55,8 +55,8 @@ class LogInViewModel(
 }
 
 data class LogInUiState(
-    var emailFieldText: String = "",
-    var passwordTextField: String = "",
+    val emailFieldText: String = "",
+    val passwordTextField: String = "",
     val isEmailValid: Boolean = true,
     val isPasswordEmpty: Boolean = false
 )
