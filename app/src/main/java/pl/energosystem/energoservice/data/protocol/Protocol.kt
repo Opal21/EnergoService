@@ -8,5 +8,5 @@ import androidx.room.PrimaryKey
 data class Protocol(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id") val id: Int = 0,
-    @ColumnInfo(name = "text") val text: String
+    @ColumnInfo(name = "comments") val comments: String
 )
