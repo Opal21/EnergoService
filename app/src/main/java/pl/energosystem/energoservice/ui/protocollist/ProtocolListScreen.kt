@@ -79,11 +79,23 @@ fun ProtocolListItem(
             modifier = Modifier.padding(8.dp)
         ) {
             Text(
+                text = protocol.locatorName,
+                style = MaterialTheme.typography.bodyMedium
+            )
+
+            Spacer(Modifier.height(8.dp))
+
+            Text(
                 text = protocol.comments,
                 style = MaterialTheme.typography.bodyMedium
             )
 
             Spacer(Modifier.height(8.dp))
+
+            Text(
+                text = protocol.serviceType.toString(),
+                style = MaterialTheme.typography.bodyMedium
+            )
         }
     }
 }

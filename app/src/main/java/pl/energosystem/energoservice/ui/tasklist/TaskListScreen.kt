@@ -120,7 +120,6 @@ fun TaskListItem(task: Task, modifier: Modifier = Modifier, onTaskClick: (Task) 
     Card(
         onClick = { onTaskClick(task) },
         modifier = modifier
-            .height(160.dp)
     ) {
         Column(
             horizontalAlignment = Alignment.Start,
@@ -128,7 +127,8 @@ fun TaskListItem(task: Task, modifier: Modifier = Modifier, onTaskClick: (Task) 
         ) {
             Text(
                 text = task.name,
-                style = MaterialTheme.typography.headlineSmall
+                style = MaterialTheme.typography.headlineSmall,
+                modifier = Modifier.align(Alignment.CenterHorizontally)
             )
 
             Spacer(Modifier.height(8.dp))

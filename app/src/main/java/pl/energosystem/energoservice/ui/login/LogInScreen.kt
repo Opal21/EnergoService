@@ -112,7 +112,7 @@ fun EmailTextField(
         label = { Text(text = stringResource(R.string.email_field_label)) },
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
         keyboardActions = KeyboardActions(onNext = onNext),
-        modifier = modifier,
+        modifier = modifier.fillMaxWidth(),
         )
 }
 
@@ -133,7 +133,7 @@ fun PasswordTextField(
             keyboardType = KeyboardType.Password
         ),
         keyboardActions = KeyboardActions(onDone = onDone),
-        modifier = modifier,
+        modifier = modifier.fillMaxWidth(),
     )
 }
 
