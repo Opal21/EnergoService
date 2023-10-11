@@ -14,14 +14,20 @@ import androidx.compose.foundation.text.KeyboardActionScope
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
@@ -30,29 +36,57 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import pl.energosystem.energoservice.data.protocol.Protocol
 import pl.energosystem.energoservice.ui.AppViewModelProvider
 
 @Composable
 fun ProtocolScreen(
-    id: String?,
-    modifier: Modifier,
+    id : Int?,
+    modifier: Modifier = Modifier,
     viewModel: ProtocolViewModel = viewModel(factory = AppViewModelProvider.Factory),
-    onSubmit: () -> Unit
+    closeProtocol: () -> Unit = {},
 ) {
     val uiState = viewModel.uiState.collectAsState()
     val focusManager = LocalFocusManager.current
 
-    ProtocolScreenContent(
-        errorMessage = uiState.value.errorMessage,
-        locatorsNameFieldValue = uiState.value.locatorNameTextField,
-        onLocatorsNameChange = viewModel::onLocatorsNameChange,
-        commentsFieldValue = uiState.value.commentsTextField,
-        onCommentsChange = viewModel::onCommentsChange,
-        serviceType = uiState.value.serviceType,
-        onServiceTypeChange = viewModel::onServiceTypeChange,
-        onNext = { focusManager.moveFocus(FocusDirection.Down) },
-        onDone = viewModel::saveProtocol,
+    id?.let { viewModel.getProtocolData(it) }
+
+    Scaffold(
+        topBar = { ProtocolScreenTopBar(
+            closeProtocol = closeProtocol,
+            modifier = modifier
+        ) }
+    ) {
+        ProtocolScreenContent(
+            errorMessage = uiState.value.errorMessage,
+            locatorsNameFieldValue = uiState.value.locatorNameTextField,
+            onLocatorsNameChange = viewModel::onLocatorsNameChange,
+            commentsFieldValue = uiState.value.commentsTextField,
+            onCommentsChange = viewModel::onCommentsChange,
+            serviceType = uiState.value.serviceType,
+            onServiceTypeChange = viewModel::onServiceTypeChange,
+            onNext = { focusManager.moveFocus(FocusDirection.Down) },
+            onSave = viewModel::saveProtocol,
+            modifier = modifier.padding(it)
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ProtocolScreenTopBar(
+    modifier: Modifier = Modifier,
+    closeProtocol: () -> Unit = {}
+    ) {
+    TopAppBar(
+        title = { Text(text = "Protocol") },
+        navigationIcon = {
+            IconButton(onClick = closeProtocol) {
+                Icon(
+                    imageVector = Icons.Filled.Close,
+                    contentDescription = "Back"
+                )
+            }
+        },
         modifier = modifier
     )
 }
@@ -67,7 +101,7 @@ fun ProtocolScreenContent(
     serviceType: ServiceType?,
     onServiceTypeChange: (ServiceType) -> Unit,
     onNext: KeyboardActionScope.() -> Unit,
-    onDone: (Protocol) -> Unit,
+    onSave: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -99,8 +133,12 @@ fun ProtocolScreenContent(
 
         ServiceTypeField(
             serviceType = serviceType,
-            onServiceTypeChange = onServiceTypeChange,
-            onDone = onDone
+            onServiceTypeChange = onServiceTypeChange
+        )
+
+        SaveButton(
+            buttonLabel = "Save",
+            onSave = onSave
         )
     }
 }
@@ -145,29 +183,40 @@ fun CommentsTextField(
 fun ServiceTypeField(
     serviceType: ServiceType?,
     onServiceTypeChange: (ServiceType) -> Unit,
-    onDone: (Protocol) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val types = listOf(ServiceType.INSTALLATION, ServiceType.FIX, ServiceType.REPLACEMENT)
-    val (selectedOption, onOptionSelected) = remember { mutableStateOf(types[0] ) }
-
     Column {
         types.forEach {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .selectable(
-                        selected = (it == selectedOption),
-                        onClick = { onOptionSelected(it) }
+                        selected = (it == serviceType),
+                        onClick = { onServiceTypeChange(it) }
                     )
             ) {
-                RadioButton(selected = (it == selectedOption), onClick = { onOptionSelected(it) })
+                RadioButton(selected = (it == serviceType), onClick = { onServiceTypeChange(it) })
                 Text(
                     text = it.toString(),
                     modifier = Modifier.padding(vertical = 16.dp)
                 )
             }
         }
+    }
+}
+
+@Composable
+fun SaveButton(
+    buttonLabel: String,
+    onSave: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Button(
+        onClick = onSave,
+        modifier = modifier
+    ) {
+        Text(text = buttonLabel)
     }
 }
 
@@ -183,6 +232,6 @@ fun ProtocolScreenContentPreview() {
         serviceType = ServiceType.INSTALLATION,
         onServiceTypeChange = {  },
         onNext = {  },
-        onDone = {  },
+        onSave = {  }
     )
 }

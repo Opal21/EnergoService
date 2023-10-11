@@ -15,10 +15,44 @@ class ProtocolViewModel(
     private val _uiState = MutableStateFlow(ProtocolUiState())
     val uiState: StateFlow<ProtocolUiState> = _uiState
 
-    fun saveProtocol(protocol: Protocol) {
+
+//    init {
+//        observeEmails()
+//    }
+//
+//    private fun observeEmails() {
+//        viewModelScope.launch {
+//            emailsRepository.getAllEmails()
+//                .catch { ex ->
+//                    _uiState.value = ReplyHomeUIState(error = ex.message)
+//                }
+//                .collect { emails ->
+//                    /**
+//                     * We set first email selected by default for first App launch in large-screens
+//                     */
+//                    _uiState.value = ReplyHomeUIState(
+//                        emails = emails,
+//                        openedEmail = emails.first()
+//                    )
+//                }
+//        }
+//    }
+
+    fun getProtocolData(protocolId: Int) {
+        viewModelScope.launch {
+            val protocolFlow = protocolsRepository.getProtocolStream(id = protocolId)
+            protocolFlow.collect {
+                _uiState.value = _uiState.value.copy(commentsTextField = it?.comments ?: "")
+            }
+        }
+    }
+
+    fun saveProtocol() {
+        val protocol = Protocol(comments = uiState.value.commentsTextField)
         if (allFieldsAreFull()) {
             viewModelScope.launch {
                 protocolsRepository.insertProtocol(protocol)
+                _uiState.value = _uiState.value.copy(errorMessage = "Saved correctly")
             }
         } else {
             _uiState.value = _uiState.value.copy(errorMessage = "Fill all fields before saving!")

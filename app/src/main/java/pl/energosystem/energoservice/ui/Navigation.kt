@@ -18,13 +18,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import pl.energosystem.energoservice.R
 import pl.energosystem.energoservice.ui.EnergoServiceRoute.PROTOCOL_LIST
 import pl.energosystem.energoservice.ui.EnergoServiceRoute.SETTINGS
 import pl.energosystem.energoservice.ui.EnergoServiceRoute.TASK_LIST
+import pl.energosystem.energoservice.ui.protocol.ProtocolScreen
 import pl.energosystem.energoservice.ui.protocollist.ProtocolListScreen
 import pl.energosystem.energoservice.ui.settings.SettingsScreen
 import pl.energosystem.energoservice.ui.tasklist.TaskListScreen
@@ -109,11 +112,21 @@ fun EnergoServiceNavHost(
             }
         }
         composable(TASK_LIST) {
-            TaskListScreen(modifier)
+            TaskListScreen(modifier) {
+                navController.navigate("protocol/${it}")
+            }
         }
         composable(PROTOCOL_LIST) {
             ProtocolListScreen(modifier) {
-                navController.navigate("protocol/$it")
+                navController.navigate("protocol/${it}")
+            }
+        }
+        composable(
+            "protocol/{id}",
+            arguments = listOf(navArgument("id") { type = NavType.IntType })
+            ) {
+            ProtocolScreen(id = it.arguments?.getInt("id")) {
+                navController.popBackStack()
             }
         }
     }

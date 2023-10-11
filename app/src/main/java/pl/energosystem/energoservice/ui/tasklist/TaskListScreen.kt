@@ -38,6 +38,7 @@ import java.time.LocalDate
 fun TaskListScreen(
     modifier: Modifier,
     viewModel: TaskListViewModel = viewModel(factory = AppViewModelProvider.Factory),
+    onProtocolClicked: (Int) -> Unit,
 ) {
     val uiState = viewModel.uiState.collectAsState()
     val openTaskDialog = remember { mutableStateOf(false) }
@@ -76,6 +77,10 @@ fun TaskListScreen(
                     // Attempt to start an activity that can handle the Intent
                     startActivity(context, mapIntent, null)
                 },
+                onProtocolClicked = {
+                    openTaskDialog.value = false
+                    onProtocolClicked(openedTask.id)
+                                    },
                 shortDescription = openedTask.shortDescription,
                 longDescription = openedTask.longDescription,
             )
@@ -145,6 +150,7 @@ fun TaskDetailsDialog(
     onDismissRequest: () -> Unit,
     onCall: () -> Unit,
     onNavigate: () -> Unit,
+    onProtocolClicked: () -> Unit,
     shortDescription: String,
     longDescription: String,
 ) {
@@ -197,6 +203,17 @@ fun TaskDetailsDialog(
                         }
                     }
                 }
+                Button(
+                    onClick = onProtocolClicked,
+                    modifier = Modifier
+                        .padding(horizontal = 5.dp)
+                ) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        Text(text = "Create protocol")
+                    }
+                }
                 TextButton(
                     onClick = {
                         onDismissRequest()
@@ -247,5 +264,6 @@ fun TaskDetailsDialogPreview() {
         onNavigate = {  },
         shortDescription = "Wymiana wodomierza",
         longDescription = "Test dialog text, let me know what you think.",
+        onProtocolClicked = {  }
     )
 }
