@@ -1,5 +1,6 @@
 package pl.energosystem.energoservice.ui.tasklist
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -32,8 +33,10 @@ import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.viewmodel.compose.viewModel
 import pl.energosystem.energoservice.data.task.Task
 import pl.energosystem.energoservice.ui.AppViewModelProvider
+import pl.energosystem.energoservice.ui.protocol.ServiceType
 import java.time.LocalDate
 
+@SuppressLint("QueryPermissionsNeeded")
 @Composable
 fun TaskListScreen(
     modifier: Modifier,
@@ -81,8 +84,8 @@ fun TaskListScreen(
                     openTaskDialog.value = false
                     onProtocolClicked(openedTask.id)
                                     },
-                shortDescription = openedTask.shortDescription,
-                longDescription = openedTask.longDescription,
+                name = openedTask.name,
+                description = openedTask.description,
             )
         }
     }
@@ -124,7 +127,7 @@ fun TaskListItem(task: Task, modifier: Modifier = Modifier, onTaskClick: (Task) 
             modifier = Modifier.padding(8.dp)
         ) {
             Text(
-                text = task.shortDescription,
+                text = task.name,
                 style = MaterialTheme.typography.headlineSmall
             )
 
@@ -151,8 +154,8 @@ fun TaskDetailsDialog(
     onCall: () -> Unit,
     onNavigate: () -> Unit,
     onProtocolClicked: () -> Unit,
-    shortDescription: String,
-    longDescription: String,
+    name: String,
+    description: String,
 ) {
     Dialog(onDismissRequest = { onDismissRequest() }) {
         Card(
@@ -169,9 +172,9 @@ fun TaskDetailsDialog(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Text(text = shortDescription)
+                Text(text = name)
 
-                Text(text = longDescription)
+                Text(text = description)
 
                 Row(
                     modifier = Modifier
@@ -234,21 +237,23 @@ fun TaskListScreenContentPreview() {
         taskList = listOf(
             Task(
                 id = 0,
-                shortDescription = "Wymiana wodomierza",
-                longDescription = "Unless your app is receiving pending intents from other apps.",
+                name = "Wymiana wodomierza",
+                description = "Unless your app is receiving pending intents from other apps.",
                 address = "1600 Amphitheatre Parkway, Mountain+View, California",
                 phoneNumber = "664254824",
                 date =  LocalDate.now().toString(),
                 isDone = false,
+                serviceType = ServiceType.REPLACEMENT
             ),
             Task(
                 id = 0,
-                shortDescription = "Naprawa podzielnika",
-                longDescription = "Unless your app is receiving pending intents from other apps.",
+                name = "Naprawa podzielnika",
+                description = "Unless your app is receiving pending intents from other apps.",
                 address = "1600 Amphitheatre Parkway, Mountain View, California",
                 phoneNumber = "664254824",
                 date =  LocalDate.now().toString(),
                 isDone = false,
+                serviceType = ServiceType.REPLACEMENT
             )
         ),
         onTaskClick = {  }
@@ -262,8 +267,8 @@ fun TaskDetailsDialogPreview() {
         onDismissRequest = {  },
         onCall = {  },
         onNavigate = {  },
-        shortDescription = "Wymiana wodomierza",
-        longDescription = "Test dialog text, let me know what you think.",
+        name = "Wymiana wodomierza",
+        description = "Test dialog text, let me know what you think.",
         onProtocolClicked = {  }
     )
 }

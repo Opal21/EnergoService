@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import pl.energosystem.energoservice.data.task.Task
 import pl.energosystem.energoservice.data.task.TasksRepository
+import pl.energosystem.energoservice.ui.protocol.ServiceType
 import java.time.LocalDate
 
 class TaskListViewModel(
@@ -22,14 +23,13 @@ class TaskListViewModel(
             tasksRepository.insertTask(
                 Task(
                     id = 0,
-                    shortDescription = "shortDescription",
-                    longDescription = "Unless your app is receiving pending intents from other apps, the above methods to create a PendingIntent are probably the only PendingIntent methods you'll ever need.\n" +
-                            "\n" +
-                            "Each method takes the current app Context, the Intent you want to wrap, and one or more flags that specify how the intent should be used (such as whether the intent can be used more than once).",
+                    name = "Task name",
+                    description = "Unless your app is receiving pending intents from other apps, the above methods to create a PendingIntent are probably the only PendingIntent methods you'll ever need.",
                     address = "1600 Amphitheatre Parkway, Mountain+View, California",
                     phoneNumber = "664254824",
                     date =  LocalDate.now().toString(),
                     isDone = false,
+                    ServiceType.INSTALLATION
                 )
             )
         }
@@ -56,12 +56,13 @@ class TaskListViewModel(
     fun markTaskAsDone(task: Task) {
         val doneTask = Task(
             id = task.id,
-            shortDescription = task.shortDescription,
-            longDescription = task.longDescription,
+            name = task.name,
+            description = task.description,
             address = task.address,
             phoneNumber = task.phoneNumber,
             date = task.date,
-            isDone = true
+            isDone = true,
+            serviceType = task.serviceType
         )
         viewModelScope.launch {
             tasksRepository.updateTask(doneTask)
