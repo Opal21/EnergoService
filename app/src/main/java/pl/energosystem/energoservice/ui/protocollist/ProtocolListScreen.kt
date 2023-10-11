@@ -17,12 +17,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import pl.energosystem.energoservice.data.protocol.Protocol
 import pl.energosystem.energoservice.ui.AppViewModelProvider
+import pl.energosystem.energoservice.ui.protocol.ServiceType
 
 @Composable
 fun ProtocolListScreen(
@@ -32,7 +32,6 @@ fun ProtocolListScreen(
     ) {
 
     val uiState = viewModel.uiState.collectAsState()
-    val context = LocalContext.current
 
     ProtocolListScreenContent(
         protocols = uiState.value.protocols,
@@ -90,17 +89,21 @@ fun ProtocolListItem(
 }
 
 @Composable
-@Preview
+@Preview(showSystemUi = true, showBackground = true)
 fun ProtocolListScreenContentPreview() {
     ProtocolListScreenContent(
         protocols = listOf(
             Protocol(
                 id = 0,
-                comments = "Test comment 1"
+                comments = "Test comment 1",
+                locatorName = "Jan Kowalski",
+                serviceType = ServiceType.INSTALLATION,
             ),
             Protocol(
                 id = 0,
-                comments = "Test comment 2"
+                comments = "Test comment 2",
+                        locatorName = "Marcin Opaliński",
+                serviceType = ServiceType.FIX,
             )
         ),
         onProtocolClick = {  }

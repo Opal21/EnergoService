@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import pl.energosystem.energoservice.data.protocol.Protocol
 import pl.energosystem.energoservice.data.protocol.ProtocolsRepository
+import pl.energosystem.energoservice.ui.protocol.ServiceType
 
 class ProtocolListViewModel(
     private val protocolsRepository: ProtocolsRepository
@@ -20,7 +21,9 @@ class ProtocolListViewModel(
             protocolsRepository.insertProtocol(
                 Protocol(
                     id = 0,
-                    comments = "Test comment"
+                    locatorName = "Jan Kowalski",
+                    comments = "Test comment",
+                    serviceType = ServiceType.INSTALLATION
                 )
             )
         }
@@ -35,11 +38,6 @@ class ProtocolListViewModel(
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
                 initialValue = ProtocolListUiState(emptyList())
             )
-
-
-    fun onProtocolClick(protocol: Protocol) {
-
-    }
 
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L

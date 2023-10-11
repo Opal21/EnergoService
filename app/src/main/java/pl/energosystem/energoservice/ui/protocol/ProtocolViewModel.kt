@@ -48,8 +48,12 @@ class ProtocolViewModel(
     }
 
     fun saveProtocol() {
-        val protocol = Protocol(comments = uiState.value.commentsTextField)
         if (allFieldsAreFull()) {
+            val protocol = Protocol(
+                locatorName = uiState.value.locatorNameTextField,
+                comments = uiState.value.commentsTextField,
+                serviceType = uiState.value.serviceType!!
+            )
             viewModelScope.launch {
                 protocolsRepository.insertProtocol(protocol)
                 _uiState.value = _uiState.value.copy(errorMessage = "Saved correctly")
