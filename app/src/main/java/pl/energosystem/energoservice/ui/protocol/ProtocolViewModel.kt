@@ -7,9 +7,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import pl.energosystem.energoservice.data.protocol.Protocol
 import pl.energosystem.energoservice.data.protocol.ProtocolsRepository
+import pl.energosystem.energoservice.data.task.TasksRepository
 
 class ProtocolViewModel(
-    private val protocolsRepository: ProtocolsRepository
+    private val protocolsRepository: ProtocolsRepository,
+    private val tasksRepository: TasksRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ProtocolUiState())
