@@ -109,12 +109,16 @@ fun ProtocolListScreenContentPreview() {
                 id = 0,
                 comments = "Test comment 1",
                 locatorName = "Jan Kowalski",
+                address = "Testowa 13a 44-200 Rybnik",
+                room = "Kitchen",
                 serviceType = ServiceType.INSTALLATION,
             ),
             Protocol(
                 id = 0,
                 comments = "Test comment 2",
-                        locatorName = "Marcin Opaliński",
+                locatorName = "Marcin Opaliński",
+                address = "Testowa 13a 44-200 Rybnik",
+                room = "Kitchen",
                 serviceType = ServiceType.FIX,
             )
         ),

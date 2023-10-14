@@ -23,6 +23,8 @@ class ProtocolListViewModel(
                     id = 0,
                     locatorName = "Jan Kowalski",
                     comments = "Test comment",
+                    address = "Testowa 13a 44-200 Rybnik",
+                    room = "Kitchen",
                     serviceType = ServiceType.INSTALLATION
                 )
             )

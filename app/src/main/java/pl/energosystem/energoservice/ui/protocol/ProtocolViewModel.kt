@@ -7,11 +7,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import pl.energosystem.energoservice.data.protocol.Protocol
 import pl.energosystem.energoservice.data.protocol.ProtocolsRepository
-import pl.energosystem.energoservice.data.task.TasksRepository
 
 class ProtocolViewModel(
-    private val protocolsRepository: ProtocolsRepository,
-    private val tasksRepository: TasksRepository
+    private val protocolsRepository: ProtocolsRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ProtocolUiState())
@@ -53,8 +51,12 @@ class ProtocolViewModel(
         if (allFieldsAreFull()) {
             val protocol = Protocol(
                 locatorName = uiState.value.locatorNameTextField,
+                address = uiState.value.commentsTextField,
+                room = uiState.value.commentsTextField,
                 comments = uiState.value.commentsTextField,
-                serviceType = uiState.value.serviceType!!
+                serviceType = uiState.value.serviceType!!,
+//                servicedDevice = Device("", "", DeviceType.WATER_METER.toString()),
+//                newDevice = null,
             )
             viewModelScope.launch {
                 protocolsRepository.insertProtocol(protocol)
