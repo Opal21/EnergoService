@@ -21,7 +21,7 @@ object AppViewModelProvider {
         // Initializer for HomeViewModel
         initializer {
             LogInViewModel(
-                energoServiceApplication().container.usersRepository
+                energoServiceApplication().container.accountService
             )
         }
 
@@ -42,7 +42,7 @@ object AppViewModelProvider {
         // Initializer for ProtocolListViewModel
         initializer {
             SettingsViewModel(
-                energoServiceApplication().container.usersRepository
+                energoServiceApplication().container.accountService
             )
         }
 
@@ -59,7 +59,7 @@ object AppViewModelProvider {
 
 /**
  * Extension function to queries for [Application] object and returns an instance of
- * [PixelApplication].
+ * [EnergoServiceApplication].
  */
 fun CreationExtras.energoServiceApplication(): EnergoServiceApplication =
     (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as EnergoServiceApplication)

@@ -15,7 +15,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
@@ -32,21 +32,22 @@ import pl.energosystem.energoservice.ui.AppViewModelProvider
 
 @Composable
 fun LogInScreen(
-    onSuccessfulLogIn: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: LogInViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: LogInViewModel = viewModel(factory = AppViewModelProvider.Factory),
+    onSuccessfulLogIn: () -> Unit,
 ) {
-    val uiState = viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState
     val focusManager = LocalFocusManager.current
 
     LogInScreenContent(
-        emailFieldValue = uiState.value.emailFieldText,
+        emailFieldValue = uiState.email,
         onEmailChange = viewModel::onEmailChange,
         onNext = { focusManager.moveFocus(FocusDirection.Down) },
-        passwordFieldValue = uiState.value.passwordTextField,
+        passwordFieldValue = uiState.password,
         onPasswordChange = viewModel::onPasswordChange,
         onDone = { focusManager.clearFocus() },
-        onLogInClick = { viewModel.logIn(onSuccessfulLogIn) },
+        onLogInClick = { viewModel.onSignInClick(onSuccessfulLogIn) },
+        errorMessage = uiState.errorMessage,
         modifier = modifier,
     )
 }
@@ -60,6 +61,7 @@ fun LogInScreenContent(
     onPasswordChange: (String) -> Unit,
     onDone: KeyboardActionScope.() -> Unit,
     onLogInClick: () -> Unit,
+    errorMessage: String,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -86,6 +88,8 @@ fun LogInScreenContent(
         )
 
         LogInButton(onLogInClick = onLogInClick)
+
+        Text(text = errorMessage, modifier.padding(horizontal = 16.dp))
     }
 }
 
@@ -151,7 +155,7 @@ fun LogInButton(
 }
 
 @Composable
-@Preview(showBackground = true, showSystemUi = true,)
+@Preview(showBackground = true, showSystemUi = true)
 fun LogInScreenContentPreview() {
     LogInScreenContent(
         emailFieldValue = "",
@@ -161,5 +165,6 @@ fun LogInScreenContentPreview() {
         onPasswordChange = {  },
         onDone = {  },
         onLogInClick = {  },
+        errorMessage = "test error message"
     )
 }

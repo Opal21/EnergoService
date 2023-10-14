@@ -13,7 +13,6 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
@@ -24,9 +23,12 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import pl.energosystem.energoservice.R
+import pl.energosystem.energoservice.ui.EnergoServiceRoute.LOG_IN
+import pl.energosystem.energoservice.ui.EnergoServiceRoute.PROTOCOL
 import pl.energosystem.energoservice.ui.EnergoServiceRoute.PROTOCOL_LIST
 import pl.energosystem.energoservice.ui.EnergoServiceRoute.SETTINGS
 import pl.energosystem.energoservice.ui.EnergoServiceRoute.TASK_LIST
+import pl.energosystem.energoservice.ui.login.LogInScreen
 import pl.energosystem.energoservice.ui.protocol.ProtocolScreen
 import pl.energosystem.energoservice.ui.protocollist.ProtocolListScreen
 import pl.energosystem.energoservice.ui.settings.SettingsScreen
@@ -36,6 +38,8 @@ object EnergoServiceRoute {
     const val TASK_LIST = "TaskList"
     const val PROTOCOL_LIST = "ProtocolList"
     const val SETTINGS = "Settings"
+    const val LOG_IN = "LogIn"
+    const val PROTOCOL = "Protocol"
 }
 
 data class EnergoServiceTopLevelDestination(
@@ -69,11 +73,10 @@ val TOP_LEVEL_DESTINATIONS = listOf(
 @Composable
 fun EnergoServiceBottomNavBar(
     selectedDestination: String,
-    navController: NavHostController,
-    bottomBarState: MutableState<Boolean>,
+    navController: NavHostController
 ) {
     AnimatedVisibility(
-        visible = bottomBarState.value,
+        visible = selectedDestination != LOG_IN,
         enter = slideInVertically(initialOffsetY = { it }),
         exit = slideOutVertically(targetOffsetY = { it }),
         content = {
@@ -99,30 +102,46 @@ fun EnergoServiceBottomNavBar(
 @Composable
 fun EnergoServiceNavHost(
     modifier: Modifier,
-    navController: NavHostController = rememberNavController(),
-    isLoggedIn: MutableState<Boolean>
+    navController: NavHostController = rememberNavController()
 ) {
     NavHost(
         navController = navController,
-        startDestination = TASK_LIST
+        startDestination = LOG_IN
     ) {
+        composable(LOG_IN) {
+            LogInScreen(modifier) {
+                navController.navigate(TASK_LIST) {
+                    launchSingleTop = true
+                    popUpTo(LOG_IN) { inclusive = true }
+                }
+            }
+        }
         composable(SETTINGS) {
-            SettingsScreen(isLoggedIn, modifier) {
-                navController.navigate(TASK_LIST)
+            SettingsScreen(modifier) {
+                navController.navigate(LOG_IN) {
+                    launchSingleTop = true
+                    popUpTo(SETTINGS) { inclusive = true }
+                }
             }
         }
         composable(TASK_LIST) {
             TaskListScreen(modifier) {
-                navController.navigate("protocol/${it}")
+                navController.navigate("protocol/${it}") {
+                    launchSingleTop = true
+                    popUpTo(TASK_LIST) { inclusive = true }
+                }
             }
         }
         composable(PROTOCOL_LIST) {
             ProtocolListScreen(modifier) {
-                navController.navigate("protocol/${it}")
+                navController.navigate("protocol/${it}") {
+                    launchSingleTop = true
+                    popUpTo(PROTOCOL_LIST) { inclusive = true }
+                }
             }
         }
         composable(
-            "protocol/{id}",
+            "$PROTOCOL/{id}",
             arguments = listOf(navArgument("id") { type = NavType.IntType })
             ) {
             ProtocolScreen(id = it.arguments?.getInt("id")) {

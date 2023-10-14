@@ -1,15 +1,19 @@
 package pl.energosystem.energoservice.ui.settings
 
 import androidx.lifecycle.ViewModel
-import pl.energosystem.energoservice.data.user.UsersRepository
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
+import pl.energosystem.energoservice.model.service.AccountService
 
 class SettingsViewModel(
-    usersRepository: UsersRepository
+    private val accountService: AccountService
 ) : ViewModel() {
 
-    fun logOut(moveToLogInScreen: () -> Unit): Boolean {
-        moveToLogInScreen()
-        return false
+    fun logOut(restartApp: () -> Unit) {
+        viewModelScope.launch {
+            accountService.signOut()
+            restartApp()
+        }
     }
 }
 

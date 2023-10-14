@@ -1,62 +1,63 @@
 package pl.energosystem.energoservice.ui.login
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import pl.energosystem.energoservice.data.user.User
-import pl.energosystem.energoservice.data.user.UsersRepository
+import pl.energosystem.energoservice.common.isValidEmail
+import pl.energosystem.energoservice.model.service.AccountService
 
 class LogInViewModel(
-    private val usersRepository: UsersRepository
+    private val accountService: AccountService
 ) : ViewModel() {
+    var uiState = mutableStateOf(LoginUiState())
+        private set
 
-    init {
-        this.viewModelScope.launch {
-            usersRepository.insertUser(User(0, "test", "test"))
+    private val email
+        get() = uiState.value.email
+    private val password
+        get() = uiState.value.password
+
+    fun onEmailChange(newValue: String) {
+        uiState.value = uiState.value.copy(email = newValue)
+    }
+
+    fun onPasswordChange(newValue: String) {
+        uiState.value = uiState.value.copy(password = newValue)
+    }
+
+    fun onSignInClick(onSuccessfulLogin: () -> Unit) {
+        if (!email.isValidEmail()) {
+            uiState.value = uiState.value.copy(errorMessage = "Invalid email")
+            return
+        }
+
+        if (password.isBlank()) {
+            uiState.value = uiState.value.copy(errorMessage = "Empty password")
+            return
+        }
+
+        viewModelScope.launch {
+            accountService.authenticate(email, password)
+            onSuccessfulLogin()
         }
     }
 
-    private val _uiState = MutableStateFlow(LogInUiState())
-    val uiState: StateFlow<LogInUiState> = _uiState
-
-    fun logIn(
-        onLogInComplete: () -> Unit,
-    ) {
-        this.viewModelScope.launch {
-            val userExists = usersRepository
-                .getUser(uiState.value.emailFieldText, uiState.value.passwordTextField) != null
-
-            if (userExists){
-                clearTextFields()
-                onLogInComplete()
-            } else {
-                _uiState.value = _uiState.value.copy(isEmailValid = false, isPasswordEmpty = true)
-            }
+    fun onForgotPasswordClick() {
+        if (!email.isValidEmail()) {
+            uiState.value = uiState.value.copy(errorMessage = "Invalid email")
+            return
         }
-    }
 
-    fun onEmailChange(newEmail: String) {
-        if(newEmail != uiState.value.emailFieldText) {
-            _uiState.value = _uiState.value.copy(emailFieldText = newEmail)
+        viewModelScope.launch {
+            accountService.sendRecoveryEmail(email)
+            uiState.value = uiState.value.copy(errorMessage = "Recovery email sent")
         }
-    }
-
-    fun onPasswordChange(newPassword: String) {
-        if(newPassword != uiState.value.passwordTextField) {
-            _uiState.value = _uiState.value.copy(passwordTextField = newPassword)
-        }
-    }
-
-    private fun clearTextFields() {
-        _uiState.value = _uiState.value.copy(emailFieldText = "", passwordTextField = "")
     }
 }
 
-data class LogInUiState(
-    val emailFieldText: String = "",
-    val passwordTextField: String = "",
-    val isEmailValid: Boolean = true,
-    val isPasswordEmpty: Boolean = false
+data class LoginUiState(
+    val email: String = "",
+    val password: String = "",
+    val errorMessage: String = ""
 )
