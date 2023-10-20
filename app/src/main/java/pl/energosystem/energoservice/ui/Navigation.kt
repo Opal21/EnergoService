@@ -27,11 +27,13 @@ import pl.energosystem.energoservice.ui.EnergoServiceRoute.LOG_IN
 import pl.energosystem.energoservice.ui.EnergoServiceRoute.PROTOCOL
 import pl.energosystem.energoservice.ui.EnergoServiceRoute.PROTOCOL_LIST
 import pl.energosystem.energoservice.ui.EnergoServiceRoute.SETTINGS
+import pl.energosystem.energoservice.ui.EnergoServiceRoute.SPLASH
 import pl.energosystem.energoservice.ui.EnergoServiceRoute.TASK_LIST
 import pl.energosystem.energoservice.ui.login.LogInScreen
 import pl.energosystem.energoservice.ui.protocol.ProtocolScreen
 import pl.energosystem.energoservice.ui.protocollist.ProtocolListScreen
 import pl.energosystem.energoservice.ui.settings.SettingsScreen
+import pl.energosystem.energoservice.ui.splash.SplashScreen
 import pl.energosystem.energoservice.ui.tasklist.TaskListScreen
 
 object EnergoServiceRoute {
@@ -40,6 +42,7 @@ object EnergoServiceRoute {
     const val SETTINGS = "Settings"
     const val LOG_IN = "LogIn"
     const val PROTOCOL = "Protocol"
+    const val SPLASH = "Splash"
 }
 
 data class EnergoServiceTopLevelDestination(
@@ -106,8 +109,17 @@ fun EnergoServiceNavHost(
 ) {
     NavHost(
         navController = navController,
-        startDestination = LOG_IN
+        startDestination = SPLASH
     ) {
+        composable(SPLASH) {
+            SplashScreen(goFurther = { route ->
+                navController.navigate(route) {
+                    launchSingleTop = true
+                    popUpTo(SPLASH) { inclusive = true }
+                }
+            })
+        }
+
         composable(LOG_IN) {
             LogInScreen(modifier) {
                 navController.navigate(TASK_LIST) {

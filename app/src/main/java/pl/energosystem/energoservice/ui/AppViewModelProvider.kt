@@ -10,6 +10,7 @@ import pl.energosystem.energoservice.ui.login.LogInViewModel
 import pl.energosystem.energoservice.ui.protocol.ProtocolViewModel
 import pl.energosystem.energoservice.ui.protocollist.ProtocolListViewModel
 import pl.energosystem.energoservice.ui.settings.SettingsViewModel
+import pl.energosystem.energoservice.ui.splash.SplashViewModel
 import pl.energosystem.energoservice.ui.tasklist.TaskListViewModel
 
 /**
@@ -17,6 +18,13 @@ import pl.energosystem.energoservice.ui.tasklist.TaskListViewModel
  */
 object AppViewModelProvider {
     val Factory = viewModelFactory {
+
+        // Initializer for SplashViewModel
+        initializer {
+            SplashViewModel(
+                energoServiceApplication().container.accountService
+            )
+        }
 
         // Initializer for HomeViewModel
         initializer {
@@ -28,14 +36,14 @@ object AppViewModelProvider {
         // Initializer for ProtocolListViewModel
         initializer {
             ProtocolListViewModel(
-                energoServiceApplication().container.protocolsRepository
+                energoServiceApplication().container.protocolStorageService
             )
         }
 
         // Initializer for ProtocolListViewModel
         initializer {
             TaskListViewModel(
-                energoServiceApplication().container.tasksRepository
+                energoServiceApplication().container.taskStorageService
             )
         }
 
@@ -49,7 +57,7 @@ object AppViewModelProvider {
         // Initializer for ProtocolListViewModel
         initializer {
             ProtocolViewModel(
-                energoServiceApplication().container.protocolsRepository
+                energoServiceApplication().container.protocolStorageService
             )
         }
 
