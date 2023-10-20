@@ -7,32 +7,13 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
-import pl.energosystem.energoservice.data.protocol.Protocol
-import pl.energosystem.energoservice.data.protocol.ProtocolsRepository
-import pl.energosystem.energoservice.ui.protocol.ServiceType
+import pl.energosystem.energoservice.model.Protocol
+import pl.energosystem.energoservice.model.service.ProtocolStorageService
 
-class ProtocolListViewModel(
-    private val protocolsRepository: ProtocolsRepository
-) : ViewModel() {
-
-    init {
-        viewModelScope.launch {
-            protocolsRepository.insertProtocol(
-                Protocol(
-                    id = 0,
-                    locatorName = "Jan Kowalski",
-                    comments = "Test comment",
-                    address = "Testowa 13a 44-200 Rybnik",
-                    room = "Kitchen",
-                    serviceType = ServiceType.INSTALLATION
-                )
-            )
-        }
-    }
+class ProtocolListViewModel(protocolStorageService: ProtocolStorageService) : ViewModel() {
 
     val uiState: StateFlow<ProtocolListUiState> =
-        protocolsRepository.getAllProtocolsStream()
+        protocolStorageService.protocols
             .filterNotNull()
             .map { ProtocolListUiState(it) }
             .stateIn(

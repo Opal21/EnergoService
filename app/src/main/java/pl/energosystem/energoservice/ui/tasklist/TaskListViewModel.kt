@@ -4,73 +4,44 @@ import android.content.Intent
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import pl.energosystem.energoservice.data.task.Task
-import pl.energosystem.energoservice.data.task.TasksRepository
-import pl.energosystem.energoservice.ui.protocol.ServiceType
-import java.time.LocalDate
+import pl.energosystem.energoservice.model.Task
+import pl.energosystem.energoservice.model.service.TaskStorageService
 
 class TaskListViewModel(
-    private val tasksRepository: TasksRepository
+    private val tasksStorageService: TaskStorageService
 ) : ViewModel() {
 
-    init {
-        observeTasks()
-        viewModelScope.launch {
-            tasksRepository.insertTask(
-                Task(
-                    id = 0,
-                    name = "Task name",
-                    description = "Unless your app is receiving pending intents from other apps, the above methods to create a PendingIntent are probably the only PendingIntent methods you'll ever need.",
-                    address = "1600 Amphitheatre Parkway, Mountain+View, California",
-                    phoneNumber = "664254824",
-                    date =  LocalDate.now().toString(),
-                    isDone = false,
-                    ServiceType.INSTALLATION
-                )
+    private var openedTask: Task? = null
+
+    val uiState: StateFlow<TaskListUiState> =
+        tasksStorageService.tasks
+            .filterNotNull()
+            .map { TaskListUiState(
+                tasks = it,
+                openedTask = openedTask
+            ) }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+                initialValue = TaskListUiState(emptyList())
             )
-        }
-    }
 
-    // UI state exposed to the UI
-    private val _uiState = MutableStateFlow(TaskListUiState(loading = true))
-    val uiState: StateFlow<TaskListUiState> = _uiState
-
-    private fun observeTasks() {
-        viewModelScope.launch{
-            tasksRepository.getAllTasksStream()
-                .catch { error ->
-                    _uiState.value = TaskListUiState(error = error.message)
-                }
-                .collect {tasks ->
-                    _uiState.value = TaskListUiState(
-                        tasks = tasks
-                    )
-                }
-        }
-    }
 
     fun markTaskAsDone(task: Task) {
-        val doneTask = Task(
-            id = task.id,
-            name = task.name,
-            description = task.description,
-            address = task.address,
-            phoneNumber = task.phoneNumber,
-            date = task.date,
-            isDone = true,
-            serviceType = task.serviceType
-        )
+        val doneTask = task.copy(completed = true)
         viewModelScope.launch {
-            tasksRepository.updateTask(doneTask)
+            tasksStorageService.update(doneTask)
         }
     }
 
     fun openTask(task: Task) {
-        _uiState.value = _uiState.value.copy(openedTask = task)
+        openedTask = task
     }
 
     fun getNavigationIntent(address: String) : Intent {
@@ -87,6 +58,10 @@ class TaskListViewModel(
     fun getDialIntent(phoneNumber: String) = Intent(Intent.ACTION_DIAL).apply {
             data = Uri.parse("tel:$phoneNumber")
         }
+
+    companion object {
+        private const val TIMEOUT_MILLIS = 5_000L
+    }
 }
 
 data class TaskListUiState(

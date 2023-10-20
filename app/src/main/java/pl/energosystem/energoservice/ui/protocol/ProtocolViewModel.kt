@@ -5,11 +5,11 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import pl.energosystem.energoservice.data.protocol.Protocol
-import pl.energosystem.energoservice.data.protocol.ProtocolsRepository
+import pl.energosystem.energoservice.model.Protocol
+import pl.energosystem.energoservice.model.service.ProtocolStorageService
 
 class ProtocolViewModel(
-    private val protocolsRepository: ProtocolsRepository
+    private val protocolStorageService: ProtocolStorageService
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ProtocolUiState())
@@ -38,28 +38,23 @@ class ProtocolViewModel(
 //        }
 //    }
 
-    fun getProtocolData(protocolId: Int) {
+    fun getProtocolData(protocolId: String) {
         viewModelScope.launch {
-            val protocolFlow = protocolsRepository.getProtocolStream(id = protocolId)
-            protocolFlow.collect {
-                _uiState.value = _uiState.value.copy(commentsTextField = it?.comments ?: "")
-            }
+            val protocolFlow = protocolStorageService.getProtocol(protocolId)
+//            protocolFlow.collect {
+//                _uiState.value = _uiState.value.copy(commentsTextField = it?.comments ?: "")
+//            }
         }
     }
 
     fun saveProtocol() {
         if (allFieldsAreFull()) {
             val protocol = Protocol(
-                locatorName = uiState.value.locatorNameTextField,
                 address = uiState.value.commentsTextField,
-                room = uiState.value.commentsTextField,
-                comments = uiState.value.commentsTextField,
-                serviceType = uiState.value.serviceType!!,
-//                servicedDevice = Device("", "", DeviceType.WATER_METER.toString()),
-//                newDevice = null,
+                description = uiState.value.commentsTextField,
             )
             viewModelScope.launch {
-                protocolsRepository.insertProtocol(protocol)
+                protocolStorageService.save(protocol)
                 _uiState.value = _uiState.value.copy(errorMessage = "Saved correctly")
             }
         } else {

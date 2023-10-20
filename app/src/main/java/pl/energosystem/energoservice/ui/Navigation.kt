@@ -154,9 +154,9 @@ fun EnergoServiceNavHost(
         }
         composable(
             "$PROTOCOL/{id}",
-            arguments = listOf(navArgument("id") { type = NavType.IntType })
+            arguments = listOf(navArgument("id") { type = NavType.StringType })
             ) {
-            ProtocolScreen(id = it.arguments?.getInt("id")) {
+            ProtocolScreen(id = it.arguments?.getString("id")) {
                 navController.popBackStack()
             }
         }

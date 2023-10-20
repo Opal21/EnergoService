@@ -1,8 +1,8 @@
 package pl.energosystem.energoservice
 
 import android.app.Application
-import pl.energosystem.energoservice.data.AppContainer
-import pl.energosystem.energoservice.data.AppDataContainer
+import pl.energosystem.energoservice.model.AppContainer
+import pl.energosystem.energoservice.model.AppDataContainer
 
 class EnergoServiceApplication: Application() {
 
@@ -12,6 +12,6 @@ class EnergoServiceApplication: Application() {
     lateinit var container: AppContainer
     override fun onCreate() {
         super.onCreate()
-        container = AppDataContainer(this)
+        container = AppDataContainer()
     }
 }

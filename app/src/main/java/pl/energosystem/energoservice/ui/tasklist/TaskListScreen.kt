@@ -31,9 +31,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.viewmodel.compose.viewModel
-import pl.energosystem.energoservice.data.task.Task
+import pl.energosystem.energoservice.model.Task
 import pl.energosystem.energoservice.ui.AppViewModelProvider
-import pl.energosystem.energoservice.ui.protocol.ServiceType
 import java.time.LocalDate
 
 @SuppressLint("QueryPermissionsNeeded")
@@ -41,7 +40,7 @@ import java.time.LocalDate
 fun TaskListScreen(
     modifier: Modifier,
     viewModel: TaskListViewModel = viewModel(factory = AppViewModelProvider.Factory),
-    onProtocolClicked: (Int) -> Unit,
+    onProtocolClicked: (String) -> Unit,
 ) {
     val uiState = viewModel.uiState.collectAsState()
     val openTaskDialog = remember { mutableStateOf(false) }
@@ -84,7 +83,7 @@ fun TaskListScreen(
                     openTaskDialog.value = false
                     onProtocolClicked(openedTask.id)
                                     },
-                name = openedTask.name,
+                name = openedTask.title,
                 description = openedTask.description,
             )
         }
@@ -126,7 +125,7 @@ fun TaskListItem(task: Task, modifier: Modifier = Modifier, onTaskClick: (Task) 
             modifier = Modifier.padding(8.dp)
         ) {
             Text(
-                text = task.name,
+                text = task.title,
                 style = MaterialTheme.typography.headlineSmall,
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
@@ -141,7 +140,7 @@ fun TaskListItem(task: Task, modifier: Modifier = Modifier, onTaskClick: (Task) 
             Spacer(Modifier.height(8.dp))
 
             Text(
-                text = "Data: " + task.date,
+                text = "Data: " + task.dueDate,
                 style = MaterialTheme.typography.bodyLarge
             )
         }
@@ -236,24 +235,20 @@ fun TaskListScreenContentPreview() {
     TaskListScreenContent(
         taskList = listOf(
             Task(
-                id = 0,
-                name = "Wymiana wodomierza",
+                title = "Wymiana wodomierza",
                 description = "Unless your app is receiving pending intents from other apps.",
                 address = "1600 Amphitheatre Parkway, Mountain+View, California",
                 phoneNumber = "664254824",
-                date =  LocalDate.now().toString(),
-                isDone = false,
-                serviceType = ServiceType.REPLACEMENT
+                dueTime =  LocalDate.now().toString(),
+                completed = false,
             ),
             Task(
-                id = 0,
-                name = "Naprawa podzielnika",
+                title = "Naprawa podzielnika",
                 description = "Unless your app is receiving pending intents from other apps.",
                 address = "1600 Amphitheatre Parkway, Mountain View, California",
                 phoneNumber = "664254824",
-                date =  LocalDate.now().toString(),
-                isDone = false,
-                serviceType = ServiceType.REPLACEMENT
+                dueTime =  LocalDate.now().toString(),
+                completed = false,
             )
         ),
         onTaskClick = {  }

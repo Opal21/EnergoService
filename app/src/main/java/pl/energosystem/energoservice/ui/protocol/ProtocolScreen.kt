@@ -40,7 +40,7 @@ import pl.energosystem.energoservice.ui.AppViewModelProvider
 
 @Composable
 fun ProtocolScreen(
-    id : Int?,
+    id : String?,
     modifier: Modifier = Modifier,
     viewModel: ProtocolViewModel = viewModel(factory = AppViewModelProvider.Factory),
     closeProtocol: () -> Unit = {},

@@ -20,15 +20,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import pl.energosystem.energoservice.data.protocol.Protocol
+import pl.energosystem.energoservice.model.Protocol
 import pl.energosystem.energoservice.ui.AppViewModelProvider
-import pl.energosystem.energoservice.ui.protocol.ServiceType
 
 @Composable
 fun ProtocolListScreen(
     modifier: Modifier = Modifier,
     viewModel: ProtocolListViewModel = viewModel(factory = AppViewModelProvider.Factory),
-    onProtocolClicked: (Int) -> Unit,
+    onProtocolClicked: (String) -> Unit,
     ) {
 
     val uiState = viewModel.uiState.collectAsState()
@@ -43,7 +42,7 @@ fun ProtocolListScreen(
 @Composable
 fun ProtocolListScreenContent(
     protocols: List<Protocol>,
-    onProtocolClick: (Int) -> Unit,
+    onProtocolClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -66,7 +65,7 @@ fun ProtocolListScreenContent(
 @Composable
 fun ProtocolListItem(
     protocol: Protocol,
-    onProtocolClick: (Int) -> Unit,
+    onProtocolClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -79,21 +78,21 @@ fun ProtocolListItem(
             modifier = Modifier.padding(8.dp)
         ) {
             Text(
-                text = protocol.locatorName,
+                text = protocol.title,
                 style = MaterialTheme.typography.bodyMedium
             )
 
             Spacer(Modifier.height(8.dp))
 
             Text(
-                text = protocol.comments,
+                text = protocol.description,
                 style = MaterialTheme.typography.bodyMedium
             )
 
             Spacer(Modifier.height(8.dp))
 
             Text(
-                text = protocol.serviceType.toString(),
+                text = protocol.completed.toString(),
                 style = MaterialTheme.typography.bodyMedium
             )
         }
@@ -106,20 +105,16 @@ fun ProtocolListScreenContentPreview() {
     ProtocolListScreenContent(
         protocols = listOf(
             Protocol(
-                id = 0,
-                comments = "Test comment 1",
-                locatorName = "Jan Kowalski",
+                title = "Test comment 1",
+                creationDate = "19.10.2023",
                 address = "Testowa 13a 44-200 Rybnik",
-                room = "Kitchen",
-                serviceType = ServiceType.INSTALLATION,
+                phoneNumber = "664254824",
             ),
             Protocol(
-                id = 0,
-                comments = "Test comment 2",
-                locatorName = "Marcin Opaliński",
+                title = "Test comment 1",
+                creationDate = "19.10.2023",
                 address = "Testowa 13a 44-200 Rybnik",
-                room = "Kitchen",
-                serviceType = ServiceType.FIX,
+                phoneNumber = "664254824",
             )
         ),
         onProtocolClick = {  }
