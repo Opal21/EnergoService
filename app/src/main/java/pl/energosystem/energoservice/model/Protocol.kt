@@ -9,6 +9,12 @@ data class Protocol(
     val description: String = "",
     val address: String = "",
     val phoneNumber: String = "",
+    val locatorsName: String = "",
+    val location: String = "",
+    val userId: String = "",
+    val oldDeviceReadout: Double = 0.0,
+    val newDeviceReadout: Double = 0.0,
     val completed: Boolean = false,
-    val userId: String = ""
+    val oldDevice: Device? = null,
+    val newDevice: Device? = null,
 )
