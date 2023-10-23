@@ -48,7 +48,7 @@ fun ProtocolScreen(
     val uiState = viewModel.uiState.collectAsState()
     val focusManager = LocalFocusManager.current
 
-    id?.let { viewModel.getProtocolData(it) }
+    id?.let { viewModel.getProtocolDataFromTask(it) }
 
     Scaffold(
         topBar = { ProtocolScreenTopBar(

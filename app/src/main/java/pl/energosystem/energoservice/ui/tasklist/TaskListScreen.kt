@@ -51,6 +51,7 @@ fun TaskListScreen(
         onTaskClick = {
             openTaskDialog.value = !openTaskDialog.value
             viewModel.openTask(it)
+            onProtocolClicked(it.id)
                       },
         modifier = modifier
     )
@@ -115,10 +116,15 @@ fun TaskListScreenContent(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TaskListItem(task: Task, modifier: Modifier = Modifier, onTaskClick: (Task) -> Unit) {
+fun TaskListItem(
+    task: Task,
+    modifier: Modifier = Modifier,
+    onTaskClick: (Task) -> Unit
+) {
     Card(
         onClick = { onTaskClick(task) },
         modifier = modifier
+            .fillMaxWidth()
     ) {
         Column(
             horizontalAlignment = Alignment.Start,

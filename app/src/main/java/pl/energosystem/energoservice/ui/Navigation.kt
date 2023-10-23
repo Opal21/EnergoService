@@ -157,7 +157,10 @@ fun EnergoServiceNavHost(
             arguments = listOf(navArgument("id") { type = NavType.StringType })
             ) {
             ProtocolScreen(id = it.arguments?.getString("id")) {
-                navController.popBackStack()
+                navController.navigate(TASK_LIST) {
+                    launchSingleTop = true
+                    popUpTo(PROTOCOL) { inclusive = true }
+                }
             }
         }
     }

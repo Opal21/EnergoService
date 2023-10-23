@@ -57,7 +57,8 @@ object AppViewModelProvider {
         // Initializer for ProtocolListViewModel
         initializer {
             ProtocolViewModel(
-                energoServiceApplication().container.protocolStorageService
+                energoServiceApplication().container.protocolStorageService,
+                energoServiceApplication().container.taskStorageService
             )
         }
 

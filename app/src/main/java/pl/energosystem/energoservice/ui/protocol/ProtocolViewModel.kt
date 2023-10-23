@@ -2,48 +2,36 @@ package pl.energosystem.energoservice.ui.protocol
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.FirebaseException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import pl.energosystem.energoservice.model.Protocol
 import pl.energosystem.energoservice.model.service.ProtocolStorageService
+import pl.energosystem.energoservice.model.service.TaskStorageService
 
 class ProtocolViewModel(
-    private val protocolStorageService: ProtocolStorageService
+    private val protocolStorageService: ProtocolStorageService,
+    private val taskStorageService: TaskStorageService
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ProtocolUiState())
     val uiState: StateFlow<ProtocolUiState> = _uiState
 
-
-//    init {
-//        observeEmails()
-//    }
-//
-//    private fun observeEmails() {
-//        viewModelScope.launch {
-//            emailsRepository.getAllEmails()
-//                .catch { ex ->
-//                    _uiState.value = ReplyHomeUIState(error = ex.message)
-//                }
-//                .collect { emails ->
-//                    /**
-//                     * We set first email selected by default for first App launch in large-screens
-//                     */
-//                    _uiState.value = ReplyHomeUIState(
-//                        emails = emails,
-//                        openedEmail = emails.first()
-//                    )
-//                }
-//        }
-//    }
-
-    fun getProtocolData(protocolId: String) {
+    fun getProtocolDataFromTask(taskId: String) {
         viewModelScope.launch {
-            val protocolFlow = protocolStorageService.getProtocol(protocolId)
-//            protocolFlow.collect {
-//                _uiState.value = _uiState.value.copy(commentsTextField = it?.comments ?: "")
-//            }
+            try {
+                val task = taskStorageService.getTask(taskId)
+                _uiState.value =
+                    if (task == null) ProtocolUiState()
+                    else
+                        ProtocolUiState(
+                            title = task.title,
+                            commentsTextField = task.description,
+                        )
+            } catch (e: FirebaseException) {
+                _uiState.value = _uiState.value.copy(errorMessage = "Something went wrong!")
+            }
         }
     }
 
@@ -88,6 +76,7 @@ enum class ServiceType {
 }
 
 data class ProtocolUiState(
+    val title: String = "",
     val locatorNameTextField: String = "",
     val commentsTextField: String = "",
     val serviceType: ServiceType? = null,
