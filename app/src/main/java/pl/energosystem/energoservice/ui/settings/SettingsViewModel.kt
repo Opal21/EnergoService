@@ -2,6 +2,7 @@ package pl.energosystem.energoservice.ui.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.FirebaseException
 import kotlinx.coroutines.launch
 import pl.energosystem.energoservice.model.service.AccountService
 
@@ -11,9 +12,12 @@ class SettingsViewModel(
 
     fun logOut(restartApp: () -> Unit) {
         viewModelScope.launch {
-            accountService.signOut()
-            restartApp()
+            try {
+                accountService.signOut()
+                restartApp()
+            } catch (e: FirebaseException) {
+                // TODO handle exception here
+            }
         }
     }
 }
-

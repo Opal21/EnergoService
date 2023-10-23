@@ -3,6 +3,7 @@ package pl.energosystem.energoservice.ui.login
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.FirebaseException
 import kotlinx.coroutines.launch
 import pl.energosystem.energoservice.common.isValidEmail
 import pl.energosystem.energoservice.model.service.AccountService
@@ -38,8 +39,12 @@ class LogInViewModel(
         }
 
         viewModelScope.launch {
-            accountService.authenticate(email, password)
-            onSuccessfulLogin()
+            try {
+                accountService.authenticate(email, password)
+                onSuccessfulLogin()
+            } catch (e: FirebaseException) {
+                uiState.value = uiState.value.copy(errorMessage = "Invalid credentials")
+            }
         }
     }
 
@@ -50,8 +55,12 @@ class LogInViewModel(
         }
 
         viewModelScope.launch {
-            accountService.sendRecoveryEmail(email)
-            uiState.value = uiState.value.copy(errorMessage = "Recovery email sent")
+            try {
+                accountService.sendRecoveryEmail(email)
+                uiState.value = uiState.value.copy(errorMessage = "Recovery email sent")
+            } catch (e: FirebaseException) {
+                uiState.value = uiState.value.copy(errorMessage = "Something went wrong")
+            }
         }
     }
 }
