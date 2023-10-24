@@ -6,7 +6,6 @@ data class Task(
     @DocumentId val id: String = "",
     val title: String = "",
     val dueDate: String = "",
-    val dueTime: String = "",
     val description: String = "",
     val address: String = "",
     val phoneNumber: String = "",
