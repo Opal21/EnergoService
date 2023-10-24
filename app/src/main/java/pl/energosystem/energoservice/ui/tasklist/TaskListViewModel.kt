@@ -1,14 +1,15 @@
 package pl.energosystem.energoservice.ui.tasklist
 
+import android.content.ActivityNotFoundException
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import pl.energosystem.energoservice.model.Task
 import pl.energosystem.energoservice.model.service.TaskStorageService
@@ -17,34 +18,50 @@ class TaskListViewModel(
     private val tasksStorageService: TaskStorageService
 ) : ViewModel() {
 
-    private var openedTask: Task? = null
+    private val _uiState = MutableStateFlow(TaskListUiState())
+    val uiState: StateFlow<TaskListUiState> = _uiState
 
-    val uiState: StateFlow<TaskListUiState> =
-        tasksStorageService.tasks
-            .filterNotNull()
-            .map { TaskListUiState(
-                tasks = it,
-                openedTask = openedTask
-            ) }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = TaskListUiState(emptyList())
-            )
+    init {
+        observeTasks()
+    }
 
-
-    fun markTaskAsDone(task: Task) {
-        val doneTask = task.copy(completed = true)
+    private fun observeTasks() {
         viewModelScope.launch {
-            tasksStorageService.update(doneTask)
+            tasksStorageService.tasks
+                .catch {ex ->
+                    _uiState.value = TaskListUiState(error = ex.message)
+                }
+                .collect {
+                    _uiState.value = TaskListUiState(tasks = it)
+                }
         }
     }
 
-    fun openTask(task: Task) {
-        openedTask = task
+    fun call(task: Task, context: Context) {
+        val callIntent = getDialIntent(task.phoneNumber)
+        // Attempt to start an activity that can handle the Intent
+        try {
+            ContextCompat.startActivity(context, callIntent, null)
+        } catch (e: ActivityNotFoundException) {
+            _uiState.value = _uiState.value.copy(error = e.message)
+        }
     }
 
-    fun getNavigationIntent(address: String) : Intent {
+    fun navigate(task: Task, context: Context) {
+        val mapIntent = getNavigationIntent(task.address)
+        // Attempt to start an activity that can handle the Intent
+        try {
+            ContextCompat.startActivity(context, mapIntent, null)
+        } catch (e: ActivityNotFoundException) {
+            _uiState.value = _uiState.value.copy(error = e.message)
+        }
+    }
+
+    fun openTask(task: Task?) {
+        _uiState.value = _uiState.value.copy(openedTask = task)
+    }
+
+    private fun getNavigationIntent(address: String) : Intent {
         // Create a Uri from an intent string. Use the result to create an Intent.
         val gmmIntentUri = Uri.parse("geo:0,0?q=$address")
         // Create an Intent from gmmIntentUri. Set the action to ACTION_VIEW
@@ -55,13 +72,10 @@ class TaskListViewModel(
         return mapIntent
     }
 
-    fun getDialIntent(phoneNumber: String) = Intent(Intent.ACTION_DIAL).apply {
+    private fun getDialIntent(phoneNumber: String) = Intent(Intent.ACTION_DIAL).apply {
             data = Uri.parse("tel:$phoneNumber")
         }
 
-    companion object {
-        private const val TIMEOUT_MILLIS = 5_000L
-    }
 }
 
 data class TaskListUiState(
