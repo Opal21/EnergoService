@@ -33,7 +33,6 @@ import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.viewmodel.compose.viewModel
 import pl.energosystem.energoservice.model.Task
 import pl.energosystem.energoservice.ui.AppViewModelProvider
-import java.time.LocalDate
 
 @SuppressLint("QueryPermissionsNeeded")
 @Composable
@@ -47,7 +46,7 @@ fun TaskListScreen(
     val context = LocalContext.current
 
     TaskListScreenContent(
-        taskList = uiState.value.tasks,
+        taskList = uiState.value.tasks.filter { !it.completed },
         onTaskClick = {
             openTaskDialog.value = !openTaskDialog.value
             viewModel.openTask(it)
@@ -132,22 +131,24 @@ fun TaskListItem(
         ) {
             Text(
                 text = task.title,
-                style = MaterialTheme.typography.headlineSmall,
+                style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
 
             Spacer(Modifier.height(8.dp))
 
             Text(
-                text = task.address,
-                style = MaterialTheme.typography.bodyLarge
+                text = "Address: " + task.address,
+                style = MaterialTheme.typography.bodyMedium,
+                maxLines = 1
             )
 
             Spacer(Modifier.height(8.dp))
 
             Text(
-                text = "Data: " + task.dueDate,
-                style = MaterialTheme.typography.bodyLarge
+                text = "Date: " + task.dueDate,
+                style = MaterialTheme.typography.bodyMedium,
+                maxLines = 1
             )
         }
     }
@@ -245,7 +246,6 @@ fun TaskListScreenContentPreview() {
                 description = "Unless your app is receiving pending intents from other apps.",
                 address = "1600 Amphitheatre Parkway, Mountain+View, California",
                 phoneNumber = "664254824",
-                dueTime =  LocalDate.now().toString(),
                 completed = false,
             ),
             Task(
@@ -253,7 +253,6 @@ fun TaskListScreenContentPreview() {
                 description = "Unless your app is receiving pending intents from other apps.",
                 address = "1600 Amphitheatre Parkway, Mountain View, California",
                 phoneNumber = "664254824",
-                dueTime =  LocalDate.now().toString(),
                 completed = false,
             )
         ),
