@@ -186,7 +186,9 @@ fun ServiceTypeField(
     modifier: Modifier = Modifier
 ) {
     val types = listOf(ServiceType.INSTALLATION, ServiceType.FIX, ServiceType.REPLACEMENT)
-    Column {
+    Column(
+        modifier = modifier
+    ) {
         types.forEach {
             Row(
                 modifier = Modifier
