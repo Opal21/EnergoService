@@ -105,16 +105,22 @@ fun ProtocolListScreenContentPreview() {
     ProtocolListScreenContent(
         protocols = listOf(
             Protocol(
-                title = "Test comment 1",
+                title = "Wymiana wodomierza",
                 creationDate = "19.10.2023",
+                description = "Zdemontować stary wodomierz i zamontować nowy.",
+                comments = "Lokator nie był obecny",
                 address = "Testowa 13a 44-200 Rybnik",
-                phoneNumber = "664254824",
+                locatorsPhoneNumber = "664254824",
+                locatorsName = "Jan Kowalski"
             ),
             Protocol(
-                title = "Test comment 1",
+                title = "Wymiana wodomierza",
                 creationDate = "19.10.2023",
+                description = "Zdemontować stary wodomierz i zamontować nowy.",
+                comments = "Lokator nie był obecny",
                 address = "Testowa 13a 44-200 Rybnik",
-                phoneNumber = "664254824",
+                locatorsPhoneNumber = "664254824",
+                locatorsName = "Jan Kowalski"
             )
         ),
         onProtocolClick = {  }
