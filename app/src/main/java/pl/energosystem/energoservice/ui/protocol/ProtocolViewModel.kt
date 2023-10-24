@@ -35,19 +35,29 @@ class ProtocolViewModel(
         }
     }
 
-    fun saveProtocol() {
+    fun saveProtocol(taskId: String?) {
         if (allFieldsAreFull()) {
             val protocol = Protocol(
                 address = uiState.value.commentsTextField,
                 description = uiState.value.commentsTextField,
             )
             viewModelScope.launch {
-                protocolStorageService.save(protocol)
-                _uiState.value = _uiState.value.copy(errorMessage = "Saved correctly")
+                try {
+                    protocolStorageService.save(protocol)
+                    _uiState.value = _uiState.value.copy(errorMessage = "Saved correctly")
+                    taskId?.let { markTaskDone(taskId) }
+                } catch (e: FirebaseException) {
+                    _uiState.value = _uiState.value.copy(errorMessage = "Something went wrong!")
+                }
             }
         } else {
             _uiState.value = _uiState.value.copy(errorMessage = "Fill all fields before saving!")
         }
+    }
+
+    private suspend fun markTaskDone(taskId: String) {
+        val task = taskStorageService.getTask(taskId) ?: return
+        taskStorageService.update(task.copy(completed = true))
     }
 
     private fun allFieldsAreFull() =

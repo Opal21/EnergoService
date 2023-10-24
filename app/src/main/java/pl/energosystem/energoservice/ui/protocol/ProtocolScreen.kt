@@ -65,7 +65,7 @@ fun ProtocolScreen(
             serviceType = uiState.value.serviceType,
             onServiceTypeChange = viewModel::onServiceTypeChange,
             onNext = { focusManager.moveFocus(FocusDirection.Down) },
-            onSave = viewModel::saveProtocol,
+            onSave = { viewModel.saveProtocol(id) },
             modifier = modifier.padding(it)
         )
     }
