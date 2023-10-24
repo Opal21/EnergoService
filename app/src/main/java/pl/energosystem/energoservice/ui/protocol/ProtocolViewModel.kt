@@ -40,6 +40,7 @@ class ProtocolViewModel(
             val protocol = Protocol(
                 address = uiState.value.commentsTextField,
                 description = uiState.value.commentsTextField,
+                taskId = taskId ?: ""
             )
             viewModelScope.launch {
                 try {

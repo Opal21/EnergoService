@@ -12,6 +12,7 @@ data class Protocol(
     val locatorsPhoneNumber: String = "",
     val locatorsName: String = "",
     val userId: String = "",
+    val taskId: String = "",
     val completed: Boolean = false,
     val oldDevice: Device? = null,
     val newDevice: Device? = null,
