@@ -3,9 +3,7 @@ package pl.energosystem.energoservice.ui.protocollist
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -29,7 +27,6 @@ fun ProtocolListScreen(
     viewModel: ProtocolListViewModel = viewModel(factory = AppViewModelProvider.Factory),
     onProtocolClicked: (String) -> Unit,
     ) {
-
     val uiState = viewModel.uiState.collectAsState()
 
     ProtocolListScreenContent(
@@ -48,7 +45,7 @@ fun ProtocolListScreenContent(
     LazyColumn(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(8.dp),
-        contentPadding = PaddingValues(horizontal = 8.dp),
+        contentPadding = PaddingValues(8.dp),
         modifier = modifier
     ) {
         items(protocols) {protocol ->
@@ -75,24 +72,26 @@ fun ProtocolListItem(
     ) {
         Column(
             horizontalAlignment = Alignment.Start,
+            verticalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier.padding(8.dp)
         ) {
             Text(
                 text = protocol.title,
-                style = MaterialTheme.typography.bodyMedium
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                style = MaterialTheme.typography.headlineSmall
             )
 
-            Spacer(Modifier.height(8.dp))
+            Text(
+                text = "Date: " + protocol.creationDate
+            )
 
             Text(
                 text = protocol.description,
                 style = MaterialTheme.typography.bodyMedium
             )
 
-            Spacer(Modifier.height(8.dp))
-
             Text(
-                text = protocol.completed.toString(),
+                text = protocol.comments,
                 style = MaterialTheme.typography.bodyMedium
             )
         }
