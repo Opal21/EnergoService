@@ -3,6 +3,7 @@ package pl.energosystem.energoservice.model.service.impl
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.dataObjects
 import com.google.firebase.firestore.ktx.toObject
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.tasks.await
@@ -13,6 +14,7 @@ import pl.energosystem.energoservice.model.service.ProtocolStorageService
 class ProtocolStorageServiceImpl
 constructor(private val firestore: FirebaseFirestore, private val auth: AccountService) : 
 ProtocolStorageService {
+    @OptIn(ExperimentalCoroutinesApi::class)
     override val protocols: Flow<List<Protocol>>
         get() = auth.currentUser.flatMapLatest { user ->
             firestore.collection(PROTOCOL_COLLECTION).whereEqualTo(USER_ID_FIELD, user.id).dataObjects()
