@@ -7,52 +7,77 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import pl.energosystem.energoservice.model.Protocol
+import pl.energosystem.energoservice.model.service.AccountService
 import pl.energosystem.energoservice.model.service.ProtocolStorageService
 import pl.energosystem.energoservice.model.service.TaskStorageService
+import java.time.LocalDate
 
 class ProtocolViewModel(
+    private val accountService: AccountService,
     private val protocolStorageService: ProtocolStorageService,
     private val taskStorageService: TaskStorageService
 ) : ViewModel() {
-
     private val _uiState = MutableStateFlow(ProtocolUiState())
-    val uiState: StateFlow<ProtocolUiState> = _uiState
+    val uiState: StateFlow<ProtocolUiState> get() = _uiState
 
-    fun getProtocolDataFromTask(taskId: String) {
+    suspend fun getProtocolDataFromTask(taskId: String) {
+        try {
+            val task = taskStorageService.getTask(taskId)
+            _uiState.value =
+                if (task == null) ProtocolUiState()
+                else
+                    ProtocolUiState(
+                        protocol = Protocol(
+                            title = task.title,
+                            creationDate = LocalDate.now().toString(),
+                            description = task.description,
+                            address = task.address,
+                            userId = accountService.currentUserId
+                        ),
+                    )
+        } catch (e: FirebaseException) {
+            _uiState.value = _uiState.value.copy(errorMessage = "Something went wrong!")
+        }
+    }
+
+    fun saveProtocol(taskId: String?) {
+        val protocol = uiState.value.protocol.copy(taskId = taskId ?: "")
         viewModelScope.launch {
             try {
-                val task = taskStorageService.getTask(taskId)
-                _uiState.value =
-                    if (task == null) ProtocolUiState()
-                    else
-                        ProtocolUiState(
-                            title = task.title,
-                            commentsTextField = task.description,
-                        )
+                protocolStorageService.save(protocol)
+                _uiState.value = _uiState.value.copy(errorMessage = "Saved correctly")
+                taskId?.let { markTaskDone(taskId) }
             } catch (e: FirebaseException) {
                 _uiState.value = _uiState.value.copy(errorMessage = "Something went wrong!")
             }
         }
     }
 
-    fun saveProtocol(taskId: String?) {
-        if (allFieldsAreFull()) {
-            val protocol = Protocol(
-                address = uiState.value.commentsTextField,
-                description = uiState.value.commentsTextField,
-                taskId = taskId ?: ""
-            )
-            viewModelScope.launch {
-                try {
-                    protocolStorageService.save(protocol)
-                    _uiState.value = _uiState.value.copy(errorMessage = "Saved correctly")
-                    taskId?.let { markTaskDone(taskId) }
-                } catch (e: FirebaseException) {
-                    _uiState.value = _uiState.value.copy(errorMessage = "Something went wrong!")
-                }
-            }
-        } else {
-            _uiState.value = _uiState.value.copy(errorMessage = "Fill all fields before saving!")
+    fun onLocatorsNameChange(newName: String) {
+        if (newName != uiState.value.protocol.locatorsName){
+            val newProtocol = uiState.value.protocol.copy(locatorsName = newName)
+            _uiState.value = uiState.value.copy(protocol = newProtocol)
+        }
+    }
+
+    fun onDescriptionChange(newDescription: String) {
+        if (newDescription != uiState.value.protocol.description) {
+            val newProtocol = uiState.value.protocol.copy(description = newDescription)
+            _uiState.value = uiState.value.copy(protocol = newProtocol)
+        }
+    }
+
+    fun onCommentsChange(newComments: String) {
+        if (newComments != uiState.value.protocol.comments) {
+            val newProtocol = uiState.value.protocol.copy(comments = newComments)
+            _uiState.value = uiState.value.copy(protocol = newProtocol)
+        }
+    }
+
+    fun onPhoneNumberChange(newPhoneNumber: String) {
+        if (newPhoneNumber != _uiState.value.protocol.locatorsPhoneNumber) {
+            val newProtocol = _uiState.value.protocol.copy(locatorsPhoneNumber = newPhoneNumber)
+            _uiState.value = _uiState.value.copy(protocol = newProtocol)
         }
     }
 
@@ -60,36 +85,9 @@ class ProtocolViewModel(
         val task = taskStorageService.getTask(taskId) ?: return
         taskStorageService.update(task.copy(completed = true))
     }
-
-    private fun allFieldsAreFull() =
-        uiState.value.locatorNameTextField.isNotBlank() && uiState.value.serviceType != null
-
-    fun onLocatorsNameChange(newName: String) {
-        if (newName != uiState.value.locatorNameTextField)
-            _uiState.value = _uiState.value.copy(locatorNameTextField = newName)
-    }
-
-    fun onCommentsChange(newComments: String) {
-        if (newComments != uiState.value.commentsTextField)
-            _uiState.value = _uiState.value.copy(commentsTextField = newComments)
-    }
-
-    fun onServiceTypeChange(newServiceType: ServiceType) {
-        if (newServiceType != uiState.value.serviceType)
-            _uiState.value = _uiState.value.copy(serviceType = newServiceType)
-    }
-}
-
-enum class ServiceType {
-    INSTALLATION,
-    REPLACEMENT,
-    FIX
 }
 
 data class ProtocolUiState(
-    val title: String = "",
-    val locatorNameTextField: String = "",
-    val commentsTextField: String = "",
-    val serviceType: ServiceType? = null,
-    val errorMessage: String = "",
+    val protocol: Protocol = Protocol(),
+    val errorMessage: String = ""
 )
