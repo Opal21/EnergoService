@@ -52,7 +52,7 @@ fun ProtocolListScreenContent(
             ProtocolListItem(
                 protocol = protocol,
                 onProtocolClick = onProtocolClick,
-                modifier = modifier
+                modifier = Modifier
             )
         }
     }
