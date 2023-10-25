@@ -140,7 +140,6 @@ fun EnergoServiceNavHost(
             TaskListScreen(modifier) {
                 navController.navigate("protocol/${it}") {
                     launchSingleTop = true
-                    popUpTo(TASK_LIST) { inclusive = true }
                 }
             }
         }
@@ -148,7 +147,6 @@ fun EnergoServiceNavHost(
             ProtocolListScreen(modifier) {
                 navController.navigate("protocol/${it}") {
                     launchSingleTop = true
-                    popUpTo(PROTOCOL_LIST) { inclusive = true }
                 }
             }
         }
@@ -157,10 +155,7 @@ fun EnergoServiceNavHost(
             arguments = listOf(navArgument("id") { type = NavType.StringType })
             ) {
             ProtocolScreen(id = it.arguments?.getString("id")) {
-                navController.navigate(TASK_LIST) {
-                    launchSingleTop = true
-                    popUpTo(PROTOCOL) { inclusive = true }
-                }
+                navController.popBackStack()
             }
         }
     }
