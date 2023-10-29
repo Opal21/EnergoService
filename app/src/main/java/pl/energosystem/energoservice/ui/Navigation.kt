@@ -79,7 +79,7 @@ fun EnergoServiceBottomNavBar(
     navController: NavHostController
 ) {
     AnimatedVisibility(
-        visible = selectedDestination != LOG_IN,
+        visible = selectedDestination != LOG_IN && selectedDestination != SPLASH,
         enter = slideInVertically(initialOffsetY = { it }),
         exit = slideOutVertically(targetOffsetY = { it }),
         content = {
