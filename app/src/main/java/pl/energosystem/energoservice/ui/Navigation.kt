@@ -138,23 +138,37 @@ fun EnergoServiceNavHost(
         }
         composable(TASK_LIST) {
             TaskListScreen(modifier) {
-                navController.navigate("protocol/${it}") {
+                navController.navigate("protocol?taskId=${it}") {
                     launchSingleTop = true
                 }
             }
         }
         composable(PROTOCOL_LIST) {
             ProtocolListScreen(modifier) {
-                navController.navigate("protocol/${it}") {
+                navController.navigate("protocol?protocolId=${it}") {
                     launchSingleTop = true
                 }
             }
         }
         composable(
-            "$PROTOCOL/{id}",
-            arguments = listOf(navArgument("id") { type = NavType.StringType })
+            "$PROTOCOL?taskId={taskId}&protocolId={protocolId}",
+            arguments = listOf(
+                navArgument("taskId") {
+                    type = NavType.StringType
+                    nullable = true
+                    defaultValue = null
+                                      },
+                navArgument("protocolId") {
+                    type = NavType.StringType
+                    nullable = true
+                    defaultValue = null
+                }
+            )
             ) {
-            ProtocolScreen(id = it.arguments?.getString("id")) {
+            ProtocolScreen(
+                taskId = it.arguments?.getString("taskId"),
+                protocolId = it.arguments?.getString("protocolId")
+            ) {
                 navController.popBackStack()
             }
         }

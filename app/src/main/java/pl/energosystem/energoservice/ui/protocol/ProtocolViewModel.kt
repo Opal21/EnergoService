@@ -40,6 +40,20 @@ class ProtocolViewModel(
         }
     }
 
+    suspend fun getProtocolDataFromProtocol(protocolId: String) {
+        try {
+            val protocol = protocolStorageService.getProtocol(protocolId)
+            _uiState.value =
+                if (protocol == null) ProtocolUiState()
+                else
+                    ProtocolUiState(
+                        protocol = protocol,
+                    )
+        } catch (e: FirebaseException) {
+            _uiState.value = _uiState.value.copy(errorMessage = "Something went wrong!")
+        }
+    }
+
     fun saveProtocol(taskId: String?) {
         val protocol = uiState.value.protocol.copy(taskId = taskId ?: "")
         viewModelScope.launch {

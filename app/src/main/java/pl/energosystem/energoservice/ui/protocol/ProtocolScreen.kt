@@ -42,7 +42,8 @@ import java.time.LocalDate
 
 @Composable
 fun ProtocolScreen(
-    id: String?,
+    taskId: String?,
+    protocolId: String?,
     modifier: Modifier = Modifier,
     closeProtocol: () -> Unit = {},
 ) {
@@ -51,7 +52,8 @@ fun ProtocolScreen(
     val focusManager = LocalFocusManager.current
 
     LaunchedEffect(Unit) {
-        id?.let { viewModel.getProtocolDataFromTask(it) }
+        taskId?.let { viewModel.getProtocolDataFromTask(it) }
+        protocolId?.let { viewModel.getProtocolDataFromProtocol(it) }
     }
 
     ProtocolScreenContent(
@@ -62,7 +64,7 @@ fun ProtocolScreen(
         onDescriptionChange = viewModel::onDescriptionChange,
         onPhoneNumberChange = viewModel::onPhoneNumberChange,
         onNext = { focusManager.moveFocus(FocusDirection.Down) },
-        onSave = { viewModel.saveProtocol(id) },
+        onSave = { viewModel.saveProtocol(taskId) },
         closeProtocol = closeProtocol,
         modifier = modifier
     )
