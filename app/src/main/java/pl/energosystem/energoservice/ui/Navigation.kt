@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -173,4 +174,13 @@ fun EnergoServiceNavHost(
             }
         }
     }
+}
+
+@Composable
+@Preview
+fun EnergoServiceBottomNavBarPreview() {
+    EnergoServiceBottomNavBar(
+        selectedDestination = TASK_LIST,
+        navController = rememberNavController()
+    )
 }
