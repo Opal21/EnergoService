@@ -58,7 +58,11 @@ class ProtocolViewModel(
         val protocol = uiState.value.protocol.copy(taskId = taskId ?: "")
         viewModelScope.launch {
             try {
-                protocolStorageService.save(protocol)
+                if (protocolStorageService.getProtocol(protocol.id) != null) {
+                    protocolStorageService.update(protocol)
+                } else {
+                    protocolStorageService.save(protocol)
+                }
                 _uiState.value = _uiState.value.copy(errorMessage = "Saved correctly")
                 taskId?.let { markTaskDone(taskId) }
             } catch (e: FirebaseException) {
