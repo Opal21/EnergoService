@@ -168,7 +168,8 @@ fun EnergoServiceNavHost(
             ) {
             ProtocolScreen(
                 taskId = it.arguments?.getString("taskId"),
-                protocolId = it.arguments?.getString("protocolId")
+                protocolId = it.arguments?.getString("protocolId"),
+                modifier = modifier
             ) {
                 navController.popBackStack()
             }
