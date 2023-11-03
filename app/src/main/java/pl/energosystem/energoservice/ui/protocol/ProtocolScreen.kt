@@ -2,18 +2,22 @@ package pl.energosystem.energoservice.ui.protocol
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActionScope
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -30,12 +34,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import pl.energosystem.energoservice.model.Device
 import pl.energosystem.energoservice.model.Protocol
 import pl.energosystem.energoservice.ui.AppViewModelProvider
 import java.time.LocalDate
@@ -50,10 +56,13 @@ fun ProtocolScreen(
     val viewModel: ProtocolViewModel = viewModel(factory = AppViewModelProvider.Factory)
     val uiState by viewModel.uiState.collectAsState()
     val focusManager = LocalFocusManager.current
+    val context = LocalContext.current
+
 
     LaunchedEffect(Unit) {
         taskId?.let { viewModel.getProtocolDataFromTask(it) }
         protocolId?.let { viewModel.getProtocolDataFromProtocol(it) }
+        viewModel.createBarcodeScanner(context)
     }
 
     ProtocolScreenContent(
@@ -66,6 +75,15 @@ fun ProtocolScreen(
         onNext = { focusManager.moveFocus(FocusDirection.Down) },
         onSave = { viewModel.saveProtocol(taskId) },
         closeProtocol = closeProtocol,
+        onOldDeviceTypeChange = viewModel::onOldDeviceTypeChange,
+        onOldDeviceReadoutChange = viewModel::onOldDeviceReadoutChange,
+        onOldDeviceSerialNumberChange = viewModel::onOldDeviceSerialNumberChange,
+        onNewDeviceTypeChange = viewModel::onNewDeviceTypeChange,
+        onNewDeviceReadoutChange = viewModel::onNewDeviceReadoutChange,
+        onNewDeviceSerialNumberChange = viewModel::onNewDeviceSerialNumberChange,
+        scanOldDeviceSerialNumber = viewModel::scanOldDeviceSerialNumber,
+        scanNewDeviceSerialNumber = viewModel::scanNewDeviceSerialNumber,
+        addNewDevice = viewModel::addDevice,
         modifier = modifier
     )
 }
@@ -78,8 +96,17 @@ fun ProtocolScreenContent(
     onCommentsChange: (String) -> Unit,
     onPhoneNumberChange: (String) -> Unit,
     onDescriptionChange: (String) -> Unit,
+    onOldDeviceTypeChange: (String) -> Unit,
+    onOldDeviceReadoutChange: (String) -> Unit,
+    onOldDeviceSerialNumberChange: (String) -> Unit,
+    onNewDeviceTypeChange: (String) -> Unit,
+    onNewDeviceReadoutChange: (String) -> Unit,
+    onNewDeviceSerialNumberChange: (String) -> Unit,
     onNext: KeyboardActionScope.() -> Unit,
     onSave: () -> Unit,
+    scanNewDeviceSerialNumber: () -> Unit,
+    scanOldDeviceSerialNumber: () -> Unit,
+    addNewDevice: () -> Unit,
     closeProtocol: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -87,18 +114,22 @@ fun ProtocolScreenContent(
         topBar = { ProtocolScreenTopBar(
             closeProtocol = closeProtocol,
             onSave = onSave,
-            modifier = modifier
         ) }
     ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
+            modifier = modifier
                 .padding(it)
                 .padding(horizontal = 16.dp)
                 .verticalScroll(rememberScrollState())
         ) {
-            Spacer(modifier = Modifier.height(32.dp))
+            Text(
+                text = errorMessage,
+                style = MaterialTheme.typography.bodyMedium
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
 
             Text(
                 text = protocol.title,
@@ -106,19 +137,19 @@ fun ProtocolScreenContent(
             )
 
             Text(
-                text = protocol.address,
+                text = "Address: " + protocol.address,
                 style = MaterialTheme.typography.bodyMedium
+            )
+
+            Text(
+                text = "Locator's info",
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.align(Alignment.Start)
             )
 
             LocatorsNameTextField(
                 locatorsNameFieldValue = protocol.locatorsName,
                 onLocatorsNameChange = onLocatorsNameChange,
-                onNext = onNext
-            )
-
-            DescriptionTextField(
-                descriptionFieldValue = protocol.description,
-                onDescriptionChange = onDescriptionChange,
                 onNext = onNext
             )
 
@@ -128,16 +159,58 @@ fun ProtocolScreenContent(
                 onNext = onNext
             )
 
+            Text(
+                text = "Protocol's info",
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.align(Alignment.Start)
+            )
+
+            DescriptionTextField(
+                descriptionFieldValue = protocol.description,
+                onDescriptionChange = onDescriptionChange,
+                onNext = onNext
+            )
+
             CommentsTextField(
                 commentsFieldValue = protocol.comments,
                 onCommentsChange = onCommentsChange,
                 onNext = onNext
             )
 
-            Text(
-                text = errorMessage,
-                style = MaterialTheme.typography.bodyMedium
-            )
+            if (protocol.newDevice != null)
+                DeviceInfoFields(
+                    deviceAge = "New Device",
+                    deviceTypeValue = protocol.newDevice.type,
+                    onDeviceTypeChange = onNewDeviceTypeChange,
+                    lastReadoutValue = protocol.newDevice.readout.toString(),
+                    onLastReadoutChange = onNewDeviceReadoutChange,
+                    serialNumberValue = protocol.newDevice.serialNumber,
+                    onSerialNumberChange = onNewDeviceSerialNumberChange,
+                    scanSerialNumber = scanNewDeviceSerialNumber,
+                    onNext = onNext,
+                    modifier = Modifier
+                        .padding(it)
+                )
+
+            if (protocol.oldDevice != null)
+                DeviceInfoFields(
+                    deviceAge = "Old Device",
+                    deviceTypeValue = protocol.oldDevice.type,
+                    onDeviceTypeChange = onOldDeviceTypeChange,
+                    lastReadoutValue = protocol.oldDevice.readout.toString(),
+                    onLastReadoutChange = onOldDeviceReadoutChange,
+                    serialNumberValue = protocol.oldDevice.serialNumber,
+                    onSerialNumberChange = onOldDeviceSerialNumberChange,
+                    scanSerialNumber = scanOldDeviceSerialNumber,
+                    onNext = onNext,
+                    modifier = Modifier
+                        .padding(it)
+                )
+
+            if (protocol.newDevice == null || protocol.oldDevice == null)
+                AddDeviceButton(buttonLabel = "Add device", onCreate = addNewDevice)
+
+            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }
@@ -262,6 +335,143 @@ fun PhoneNumberField(
 }
 
 @Composable
+fun AddDeviceButton(
+    buttonLabel: String,
+    onCreate: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Button(onClick = onCreate) {
+        Text(text = buttonLabel)
+    }
+}
+
+@Composable
+fun DeviceInfoFields(
+    deviceAge: String,
+    deviceTypeValue: String,
+    onDeviceTypeChange: (String) -> Unit,
+    lastReadoutValue: String,
+    onLastReadoutChange: (String) -> Unit,
+    serialNumberValue: String,
+    onSerialNumberChange: (String) -> Unit,
+    onNext: KeyboardActionScope.() -> Unit,
+    scanSerialNumber: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(
+            text = deviceAge,
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.align(Alignment.Start)
+        )
+
+        DeviceTypeTextField(
+            deviceTypeValue = deviceTypeValue,
+            onDeviceTypeChange = onDeviceTypeChange,
+            onNext = onNext
+        )
+
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            SerialNumberField(
+                serialNumberValue = serialNumberValue,
+                onSerialNumberChange = onSerialNumberChange,
+                onNext = onNext,
+                modifier = Modifier
+                    .weight(1f)
+            )
+
+            ScanSerialNumberButton(
+                onClick = scanSerialNumber,
+            )
+        }
+
+        LastReadOutTextField(
+            lastReadoutValue = lastReadoutValue,
+            onLastReadoutChange = onLastReadoutChange,
+            onNext = onNext
+        )
+    }
+}
+
+@Composable
+fun DeviceTypeTextField(
+    deviceTypeValue: String,
+    onDeviceTypeChange: (String) -> Unit,
+    onNext: KeyboardActionScope.() -> Unit,
+    modifier: Modifier = Modifier
+) {
+    TextField(
+        value = deviceTypeValue,
+        onValueChange = onDeviceTypeChange,
+        label = { Text(text = "Device type") },
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+        keyboardActions = KeyboardActions(onNext = onNext),
+        modifier = modifier.fillMaxWidth()
+    )
+}
+
+@Composable
+fun LastReadOutTextField(
+    lastReadoutValue: String,
+    onLastReadoutChange: (String) -> Unit,
+    onNext: KeyboardActionScope.() -> Unit,
+    modifier: Modifier = Modifier
+) {
+    TextField(
+        value = lastReadoutValue,
+        onValueChange = onLastReadoutChange,
+        label = { Text(text = "Last readout") },
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+        keyboardActions = KeyboardActions(onNext = onNext),
+        modifier = modifier.fillMaxWidth()
+    )
+}
+
+@Composable
+fun SerialNumberField(
+    serialNumberValue: String,
+    onSerialNumberChange: (String) -> Unit,
+    onNext: KeyboardActionScope.() -> Unit,
+    modifier: Modifier = Modifier
+) {
+    TextField(
+        value = serialNumberValue,
+        onValueChange = onSerialNumberChange,
+        label = { Text(text = "Serial number") },
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Number,
+            imeAction = ImeAction.Next
+        ),
+        keyboardActions = KeyboardActions(onNext = onNext),
+        singleLine = true,
+        trailingIcon = { Icons.Default.Edit },
+        modifier = modifier
+            .defaultMinSize(minHeight = 40.dp)
+    )
+}
+
+@Composable
+fun ScanSerialNumberButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    IconButton(
+        onClick = onClick,
+        modifier = modifier
+            .size(50.dp)
+    ) {
+        Icon(Icons.Default.Add, contentDescription = "Add icon")
+    }
+}
+
+@Composable
 @Preview(showSystemUi = true, showBackground = true)
 fun ProtocolScreenContentPreview() {
     ProtocolScreenContent(
@@ -273,6 +483,16 @@ fun ProtocolScreenContentPreview() {
             address = "Damrota 7, 44-200 Rybnik",
             locatorsPhoneNumber = "664254824",
             locatorsName = "Jan Kowalski",
+            oldDevice = Device(
+                type = "wodomierz",
+                readout = 22.324,
+                serialNumber = "23432534"
+            ),
+            newDevice = Device(
+                type = "wodomierz",
+                readout = 22.324,
+                serialNumber = "23432534"
+            )
         ),
         errorMessage = "test error message",
         onLocatorsNameChange = {  },
@@ -282,5 +502,14 @@ fun ProtocolScreenContentPreview() {
         onSave = {  },
         closeProtocol = {  },
         onPhoneNumberChange = {  },
+        onOldDeviceReadoutChange =  {  },
+        onOldDeviceTypeChange = {  },
+        onOldDeviceSerialNumberChange = {  },
+        onNewDeviceSerialNumberChange =  {  },
+        onNewDeviceTypeChange = {  },
+        onNewDeviceReadoutChange = {  },
+        scanNewDeviceSerialNumber = {},
+        scanOldDeviceSerialNumber = {},
+        addNewDevice = {},
     )
 }

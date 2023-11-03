@@ -1,11 +1,16 @@
 package pl.energosystem.energoservice.ui.protocol
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.FirebaseException
+import com.google.mlkit.vision.codescanner.GmsBarcodeScanner
+import com.google.mlkit.vision.codescanner.GmsBarcodeScannerOptions
+import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import pl.energosystem.energoservice.model.Device
 import pl.energosystem.energoservice.model.Protocol
 import pl.energosystem.energoservice.model.service.AccountService
 import pl.energosystem.energoservice.model.service.ProtocolStorageService
@@ -17,8 +22,11 @@ class ProtocolViewModel(
     private val protocolStorageService: ProtocolStorageService,
     private val taskStorageService: TaskStorageService
 ) : ViewModel() {
+
     private val _uiState = MutableStateFlow(ProtocolUiState())
     val uiState: StateFlow<ProtocolUiState> get() = _uiState
+
+    private lateinit var scanner: GmsBarcodeScanner
 
     suspend fun getProtocolDataFromTask(taskId: String) {
         try {
@@ -52,6 +60,14 @@ class ProtocolViewModel(
         } catch (e: FirebaseException) {
             _uiState.value = _uiState.value.copy(errorMessage = "Something went wrong!")
         }
+    }
+
+    fun createBarcodeScanner(context: Context) {
+        val options = GmsBarcodeScannerOptions.Builder()
+            .enableAutoZoom()
+            .build()
+
+        scanner = GmsBarcodeScanning.getClient(context, options)
     }
 
     fun saveProtocol(taskId: String?) {
@@ -96,6 +112,180 @@ class ProtocolViewModel(
         if (newPhoneNumber != _uiState.value.protocol.locatorsPhoneNumber) {
             val newProtocol = _uiState.value.protocol.copy(locatorsPhoneNumber = newPhoneNumber)
             _uiState.value = _uiState.value.copy(protocol = newProtocol)
+        }
+    }
+
+    fun onOldDeviceTypeChange(newDeviceType: String) {
+        var oldDevice = _uiState.value.protocol.oldDevice
+        if (oldDevice != null) {
+            if (newDeviceType != oldDevice.type) {
+                oldDevice = oldDevice.copy(type = newDeviceType)
+                _uiState.value = _uiState.value.copy(
+                    protocol = _uiState.value.protocol.copy(oldDevice = oldDevice)
+                )
+            }
+        } else {
+            oldDevice = Device(type = newDeviceType)
+            _uiState.value = _uiState.value.copy(
+                protocol = _uiState.value.protocol.copy(oldDevice = oldDevice)
+            )
+        }
+    }
+
+    fun onOldDeviceReadoutChange(newReadout: String) {
+        var oldDevice = _uiState.value.protocol.oldDevice
+        if (oldDevice != null) {
+            if (newReadout != oldDevice.readout.toString()) {
+                oldDevice = oldDevice.copy(readout = newReadout.toDouble())
+                _uiState.value = _uiState.value.copy(
+                    protocol = _uiState.value.protocol.copy(oldDevice = oldDevice)
+                )
+            }
+        } else {
+            oldDevice = Device(readout = newReadout.toDouble())
+            _uiState.value = _uiState.value.copy(
+                protocol = _uiState.value.protocol.copy(oldDevice = oldDevice)
+            )
+        }
+    }
+
+    fun onOldDeviceSerialNumberChange(newSerialNumber: String) {
+        var oldDevice = _uiState.value.protocol.oldDevice
+        if (oldDevice != null) {
+            if (newSerialNumber != oldDevice.serialNumber) {
+                oldDevice = oldDevice.copy(serialNumber = newSerialNumber)
+                _uiState.value = _uiState.value.copy(
+                    protocol = _uiState.value.protocol.copy(oldDevice = oldDevice)
+                )
+            }
+        } else {
+            oldDevice = Device(serialNumber = newSerialNumber)
+            _uiState.value = _uiState.value.copy(
+                protocol = _uiState.value.protocol.copy(oldDevice = oldDevice)
+            )
+        }
+    }
+
+    fun onNewDeviceTypeChange(newDeviceType: String) {
+        var newDevice = _uiState.value.protocol.newDevice
+        if (newDevice != null) {
+            if (newDeviceType != newDevice.type) {
+                newDevice = newDevice.copy(type = newDeviceType)
+                _uiState.value = _uiState.value.copy(
+                    protocol = _uiState.value.protocol.copy(newDevice = newDevice)
+                )
+            }
+        } else {
+            newDevice = Device(type = newDeviceType)
+            _uiState.value = _uiState.value.copy(
+                protocol = _uiState.value.protocol.copy(newDevice = newDevice)
+            )
+        }
+    }
+
+    fun onNewDeviceReadoutChange(newReadout: String) {
+        var newDevice = _uiState.value.protocol.newDevice
+        if (newDevice != null) {
+            if (newReadout != newDevice.readout.toString()) {
+                newDevice = newDevice.copy(readout = newReadout.toDouble())
+                _uiState.value = _uiState.value.copy(
+                    protocol = _uiState.value.protocol.copy(newDevice = newDevice)
+                )
+            }
+        } else {
+            newDevice = Device(readout = newReadout.toDouble())
+            _uiState.value = _uiState.value.copy(
+                protocol = _uiState.value.protocol.copy(newDevice = newDevice)
+            )
+        }
+
+    }
+
+    fun onNewDeviceSerialNumberChange(newSerialNumber: String) {
+        var newDevice = _uiState.value.protocol.newDevice
+        if (newDevice != null) {
+            if (newSerialNumber != newDevice.serialNumber) {
+                newDevice = newDevice.copy(serialNumber = newSerialNumber)
+                _uiState.value = _uiState.value.copy(
+                    protocol = _uiState.value.protocol.copy(newDevice = newDevice)
+                )
+            }
+        } else {
+            newDevice = Device(serialNumber = newSerialNumber)
+            _uiState.value = _uiState.value.copy(
+                protocol = _uiState.value.protocol.copy(newDevice = newDevice)
+            )
+        }
+    }
+
+    fun scanOldDeviceSerialNumber() {
+        scanner.startScan()
+            .addOnSuccessListener { barcode ->
+                // Task completed successfully
+                println(" Raw value: " + barcode.rawValue)
+                val serialNum = barcode.rawValue ?: ""
+                var oldDevice = _uiState.value.protocol.oldDevice
+                if (oldDevice != null) {
+                    if (serialNum != oldDevice.serialNumber) {
+                        oldDevice = oldDevice.copy(serialNumber = serialNum)
+                        _uiState.value = _uiState.value.copy(
+                            protocol = _uiState.value.protocol.copy(oldDevice = oldDevice)
+                        )
+                    }
+                } else {
+                    oldDevice = Device(serialNumber = serialNum)
+                    _uiState.value = _uiState.value.copy(
+                        protocol = _uiState.value.protocol.copy(oldDevice = oldDevice)
+                    )
+                }
+            }
+            .addOnCanceledListener {
+                // Task canceled
+            }
+            .addOnFailureListener { e ->
+                // Task failed with an exception
+            }
+    }
+
+    fun scanNewDeviceSerialNumber() {
+        scanner.startScan()
+            .addOnSuccessListener { barcode ->
+                // Task completed successfully
+                println("Raw value: " + barcode.rawValue)
+                val serialNum = barcode.rawValue ?: ""
+
+                var newDevice = _uiState.value.protocol.newDevice
+                if (newDevice != null) {
+                    if (serialNum != newDevice.serialNumber) {
+                        newDevice = newDevice.copy(serialNumber = serialNum)
+                        _uiState.value = _uiState.value.copy(
+                            protocol = _uiState.value.protocol.copy(newDevice = newDevice)
+                        )
+                    }
+                } else {
+                    newDevice = Device(serialNumber = serialNum)
+                    _uiState.value = _uiState.value.copy(
+                        protocol = _uiState.value.protocol.copy(newDevice = newDevice)
+                    )
+                }
+            }
+            .addOnCanceledListener {
+                // Task canceled
+            }
+            .addOnFailureListener { e ->
+                // Task failed with an exception
+            }
+    }
+
+    fun addDevice() {
+        if (_uiState.value.protocol.newDevice == null){
+            _uiState.value = _uiState.value.copy(
+                protocol = _uiState.value.protocol.copy(newDevice = Device())
+            )
+        } else if(_uiState.value.protocol.oldDevice == null) {
+            _uiState.value = _uiState.value.copy(
+                protocol = _uiState.value.protocol.copy(oldDevice = Device())
+            )
         }
     }
 
