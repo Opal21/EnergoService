@@ -182,7 +182,7 @@ fun ProtocolScreenContent(
                     deviceAge = "New Device",
                     deviceTypeValue = protocol.newDevice.type,
                     onDeviceTypeChange = onNewDeviceTypeChange,
-                    lastReadoutValue = protocol.newDevice.readout.toString(),
+                    lastReadoutValue = protocol.newDevice.readout,
                     onLastReadoutChange = onNewDeviceReadoutChange,
                     serialNumberValue = protocol.newDevice.serialNumber,
                     onSerialNumberChange = onNewDeviceSerialNumberChange,
@@ -197,7 +197,7 @@ fun ProtocolScreenContent(
                     deviceAge = "Old Device",
                     deviceTypeValue = protocol.oldDevice.type,
                     onDeviceTypeChange = onOldDeviceTypeChange,
-                    lastReadoutValue = protocol.oldDevice.readout.toString(),
+                    lastReadoutValue = protocol.oldDevice.readout,
                     onLastReadoutChange = onOldDeviceReadoutChange,
                     serialNumberValue = protocol.oldDevice.serialNumber,
                     onSerialNumberChange = onOldDeviceSerialNumberChange,
@@ -428,8 +428,12 @@ fun LastReadOutTextField(
         value = lastReadoutValue,
         onValueChange = onLastReadoutChange,
         label = { Text(text = "Last readout") },
-        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Number,
+            imeAction = ImeAction.Next
+        ),
         keyboardActions = KeyboardActions(onNext = onNext),
+        singleLine = true,
         modifier = modifier.fillMaxWidth()
     )
 }
@@ -485,12 +489,12 @@ fun ProtocolScreenContentPreview() {
             locatorsName = "Jan Kowalski",
             oldDevice = Device(
                 type = "wodomierz",
-                readout = 22.324,
+                readout = "22.324",
                 serialNumber = "23432534"
             ),
             newDevice = Device(
                 type = "wodomierz",
-                readout = 22.324,
+                readout = "22.324",
                 serialNumber = "23432534"
             )
         ),

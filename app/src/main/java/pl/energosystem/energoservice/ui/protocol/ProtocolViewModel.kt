@@ -135,14 +135,14 @@ class ProtocolViewModel(
     fun onOldDeviceReadoutChange(newReadout: String) {
         var oldDevice = _uiState.value.protocol.oldDevice
         if (oldDevice != null) {
-            if (newReadout != oldDevice.readout.toString()) {
-                oldDevice = oldDevice.copy(readout = newReadout.toDouble())
+            if (newReadout != oldDevice.readout) {
+                oldDevice = oldDevice.copy(readout = newReadout)
                 _uiState.value = _uiState.value.copy(
                     protocol = _uiState.value.protocol.copy(oldDevice = oldDevice)
                 )
             }
         } else {
-            oldDevice = Device(readout = newReadout.toDouble())
+            oldDevice = Device(readout = newReadout)
             _uiState.value = _uiState.value.copy(
                 protocol = _uiState.value.protocol.copy(oldDevice = oldDevice)
             )
@@ -186,14 +186,14 @@ class ProtocolViewModel(
     fun onNewDeviceReadoutChange(newReadout: String) {
         var newDevice = _uiState.value.protocol.newDevice
         if (newDevice != null) {
-            if (newReadout != newDevice.readout.toString()) {
-                newDevice = newDevice.copy(readout = newReadout.toDouble())
+            if (newReadout != newDevice.readout) {
+                newDevice = newDevice.copy(readout = newReadout)
                 _uiState.value = _uiState.value.copy(
                     protocol = _uiState.value.protocol.copy(newDevice = newDevice)
                 )
             }
         } else {
-            newDevice = Device(readout = newReadout.toDouble())
+            newDevice = Device(readout = newReadout)
             _uiState.value = _uiState.value.copy(
                 protocol = _uiState.value.protocol.copy(newDevice = newDevice)
             )
