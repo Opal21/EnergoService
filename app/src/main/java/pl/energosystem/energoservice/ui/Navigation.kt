@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -79,7 +80,7 @@ fun EnergoServiceBottomNavBar(
     navController: NavHostController
 ) {
     AnimatedVisibility(
-        visible = selectedDestination != LOG_IN,
+        visible = selectedDestination != LOG_IN && selectedDestination != SPLASH,
         enter = slideInVertically(initialOffsetY = { it }),
         exit = slideOutVertically(targetOffsetY = { it }),
         content = {
@@ -138,25 +139,49 @@ fun EnergoServiceNavHost(
         }
         composable(TASK_LIST) {
             TaskListScreen(modifier) {
-                navController.navigate("protocol/${it}") {
+                navController.navigate("protocol?taskId=${it}") {
                     launchSingleTop = true
                 }
             }
         }
         composable(PROTOCOL_LIST) {
             ProtocolListScreen(modifier) {
-                navController.navigate("protocol/${it}") {
+                navController.navigate("protocol?protocolId=${it}") {
                     launchSingleTop = true
                 }
             }
         }
         composable(
-            "$PROTOCOL/{id}",
-            arguments = listOf(navArgument("id") { type = NavType.StringType })
+            "$PROTOCOL?taskId={taskId}&protocolId={protocolId}",
+            arguments = listOf(
+                navArgument("taskId") {
+                    type = NavType.StringType
+                    nullable = true
+                    defaultValue = null
+                                      },
+                navArgument("protocolId") {
+                    type = NavType.StringType
+                    nullable = true
+                    defaultValue = null
+                }
+            )
             ) {
-            ProtocolScreen(id = it.arguments?.getString("id")) {
+            ProtocolScreen(
+                taskId = it.arguments?.getString("taskId"),
+                protocolId = it.arguments?.getString("protocolId"),
+                modifier = modifier
+            ) {
                 navController.popBackStack()
             }
         }
     }
+}
+
+@Composable
+@Preview
+fun EnergoServiceBottomNavBarPreview() {
+    EnergoServiceBottomNavBar(
+        selectedDestination = TASK_LIST,
+        navController = rememberNavController()
+    )
 }

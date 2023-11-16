@@ -2,7 +2,6 @@ package pl.energosystem.energoservice.model.service.impl
 
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.dataObjects
-import com.google.firebase.firestore.toObject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
@@ -20,8 +19,14 @@ ProtocolStorageService {
             firestore.collection(PROTOCOL_COLLECTION).whereEqualTo(USER_ID_FIELD, user.id).dataObjects()
         }
 
-    override suspend fun getProtocol(protocolId: String): Protocol? =
-        firestore.collection(PROTOCOL_COLLECTION).document(protocolId).get().await().toObject()
+    override suspend fun getProtocol(protocolId: String): Protocol? {
+        val querySnapshot = firestore.collection(PROTOCOL_COLLECTION)
+            .whereEqualTo(USER_ID_FIELD, auth.currentUserId)
+            .get()
+            .await()
+
+        return querySnapshot.documents.firstOrNull()?.toObject(Protocol::class.java)
+    }
 
     override suspend fun save(protocol: Protocol): String {
         val protocolWithUserId = protocol.copy(userId = auth.currentUserId)

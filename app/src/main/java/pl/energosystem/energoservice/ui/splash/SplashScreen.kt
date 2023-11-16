@@ -29,7 +29,6 @@ fun SplashScreen(
     viewModel: SplashViewModel = viewModel(factory = AppViewModelProvider.Factory),
     goFurther: (String) -> Unit
 ) {
-
     SplashScreenContent(
         modifier = modifier,
         showError = viewModel.showError.value,
@@ -69,7 +68,7 @@ fun SplashScreenContent(
 
     LaunchedEffect(true) {
         delay(SPLASH_TIMEOUT)
-       goFurther()
+        goFurther()
     }
 }
 
