@@ -174,7 +174,7 @@ fun ErrorMessageText(
 }
 
 @Composable
-@Preview(showSystemUi = true, showBackground = true)
+@Preview(showSystemUi = true, showBackground = true, apiLevel = 33)
 fun TaskDetailsDialogPreview() {
     TaskDetailsDialog(
         onDismissRequest = {  },

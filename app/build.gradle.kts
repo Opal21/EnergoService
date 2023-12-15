@@ -12,9 +12,9 @@ android {
     defaultConfig {
         applicationId = "pl.energosystem.energoservice"
         minSdk = 29
-        targetSdk = 33
-        versionCode = 3
-        versionName = "1.2"
+        targetSdk = 34
+        versionCode = 5
+        versionName = "1.4"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -42,7 +42,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.4"
+        kotlinCompilerExtensionVersion = "1.5.5"
     }
     packaging {
         resources {
@@ -55,10 +55,10 @@ dependencies {
 
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
-    implementation("androidx.activity:activity-compose:1.8.0")
+    implementation("androidx.activity:activity-compose:1.8.2")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
-    implementation("androidx.navigation:navigation-compose:2.7.5")
+    implementation("androidx.navigation:navigation-compose:2.7.6")
     // Compose
     implementation(platform("androidx.compose:compose-bom:2023.10.01"))
     implementation("androidx.compose.ui:ui")
@@ -70,7 +70,7 @@ dependencies {
     implementation("com.google.android.gms:play-services-code-scanner:16.1.0")
     implementation("com.google.android.gms:play-services-auth:20.7.0")
     // Firebase
-    implementation(platform("com.google.firebase:firebase-bom:32.5.0"))
+    implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.firebase:firebase-auth")
