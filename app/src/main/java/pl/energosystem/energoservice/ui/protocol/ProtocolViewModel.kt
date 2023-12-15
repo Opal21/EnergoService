@@ -39,6 +39,7 @@ class ProtocolViewModel(
                             title = task.title,
                             creationDate = LocalDate.now().toString(),
                             description = task.description,
+                            locatorsPhoneNumber = task.phoneNumber,
                             address = task.address,
                             userId = accountService.currentUserId
                         ),
@@ -74,7 +75,7 @@ class ProtocolViewModel(
         val protocol = uiState.value.protocol.copy(taskId = taskId ?: "")
         viewModelScope.launch {
             try {
-                if (protocolStorageService.getProtocol(protocol.id) != null) {
+                if (protocol.id.isNotBlank() && protocolStorageService.getProtocol(protocol.id) != null) {
                     protocolStorageService.update(protocol)
                 } else {
                     protocolStorageService.save(protocol)
