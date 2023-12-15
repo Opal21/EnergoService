@@ -1,6 +1,5 @@
 package pl.energosystem.energoservice.ui.tasklist
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -25,7 +24,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import pl.energosystem.energoservice.model.Task
 import pl.energosystem.energoservice.ui.AppViewModelProvider
 
-@SuppressLint("QueryPermissionsNeeded")
+
 @Composable
 fun TaskListScreen(
     modifier: Modifier,
@@ -42,7 +41,6 @@ fun TaskListScreen(
             openTaskDialog.value = !openTaskDialog.value
             viewModel.openTask(it)
                       },
-        modifier = modifier
     )
 
     when {
